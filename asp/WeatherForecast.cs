@@ -11,6 +11,8 @@ namespace asp
         public string? Summary { get; set; }
 
         public string? StudentName { get; set; }
+
         public string? StudentName2 { get; set; }
+
     }
 }

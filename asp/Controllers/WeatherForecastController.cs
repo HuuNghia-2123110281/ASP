@@ -27,7 +27,9 @@ namespace asp.Controllers
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)],
                 StudentName = "Nguyen Huu Nghia",
+
                 StudentName2 = "Nguyen Duc Huy",
+
             })
             .ToArray();
         }
