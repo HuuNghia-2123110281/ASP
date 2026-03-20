@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Microsoft.EntityFrameworkCore;
+using asp.Data; // Đảm bảo namespace này trỏ đúng vào file AppDbContext của bạn
 
 namespace asp.Controllers
 {
@@ -8,52 +8,73 @@ namespace asp.Controllers
     [ApiController]
     public class BatDongSanController : ControllerBase
     {
-        // GET: api/<CategoryController1>
+        private readonly AppDbContext _context;
+
+        // Constructor để Inject DbContext vào Controller
+        public BatDongSanController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/BatDongSan
+        // Lấy danh sách toàn bộ bất động sản từ SQL Server
         [HttpGet]
-        public IEnumerable<BatDongSan> Get()
+        public async Task<ActionResult<IEnumerable<asp.Data.BatDongSan>>> GetBatDongSans()
         {
-            return new List<BatDongSan>()
-    {
-        new BatDongSan {
-            Id = 1,
-            TieuDe = "Căn hộ cao cấp Vinhomes",
-            DiaChi = "Bình Thạnh, TP.HCM",
-            Gia = 4500000000,
-            LoaiHinh = "Căn hộ"
-        },
-        new BatDongSan {
-            Id = 2,
-            TieuDe = "Đất nền sổ đỏ chính chủ",
-            DiaChi = "Đức Hòa, Long An",
-            Gia = 1200000000,   
-            LoaiHinh = "Đất nền"
-        }
-    };
+            // Kiểm tra nếu DbSet bị null
+            if (_context.BatDongSans == null)
+            {
+                return NotFound();
+            }
+            return await _context.BatDongSans.ToListAsync();
         }
 
-        // GET api/<CategoryController1>/5
+        // GET: api/BatDongSan/5
+        // Lấy chi tiết một bất động sản theo ID
         [HttpGet("{id}")]
-        public BatDongSan Get(int id)
+        public async Task<ActionResult<asp.Data.BatDongSan>> GetBatDongSan(int id)
         {
-            return new BatDongSan { Id = id, TieuDe = "Căn hộ mẫu", DiaChi = "Địa chỉ mẫu", Gia = 0 };
+            if (_context.BatDongSans == null)
+            {
+                return NotFound();
+            }
+
+            var batDongSan = await _context.BatDongSans.FindAsync(id);
+
+            if (batDongSan == null)
+            {
+                return NotFound();
+            }
+
+            return batDongSan;
         }
 
-        // POST api/<CategoryController1>
+        // POST: api/BatDongSan
+        // Thêm mới một bất động sản vào SQL Server
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<asp.Data.BatDongSan>> PostBatDongSan(asp.Data.BatDongSan batDongSan)
         {
+            _context.BatDongSans.Add(batDongSan);
+            await _context.Set<asp.Data.BatDongSan>().AddAsync(batDongSan);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetBatDongSan", new { id = batDongSan.Id }, batDongSan);
         }
 
-        // PUT api/<CategoryController1>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<CategoryController1>/5
+        // DELETE: api/BatDongSan/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> DeleteBatDongSan(int id)
         {
+            var batDongSan = await _context.BatDongSans.FindAsync(id);
+            if (batDongSan == null)
+            {
+                return NotFound();
+            }
+
+            _context.BatDongSans.Remove(batDongSan);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
