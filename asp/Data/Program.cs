@@ -13,6 +13,7 @@ var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
 // Đăng ký IMongoDatabase dưới dạng Singleton để các Controller có thể sử dụng
 builder.Services.AddSingleton(mongoDatabase);
+builder.Services.AddSingleton<IMongoClient>(mongoClient);
 
 // 3. Cấu hình CORS (Giữ nguyên để giao diện HTML gọi được API)
 builder.Services.AddCors(options =>

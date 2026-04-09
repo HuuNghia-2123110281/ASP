@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Danh mục - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #202124;
+            --light: #f8f9fa;
+            --danger: #d93025;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--light);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+        }
+
+        /* Form nhập liệu */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Bảng danh sách */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f1f3f4;
+            color: var(--dark);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-delete {
+            color: var(--danger);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <h1><i class="fas fa-list"></i> Quản lý Danh mục BĐS</h1>
+            <a href="index.html" style="text-decoration: none; color: var(--gray);"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
+        </header>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>Thêm Danh mục Mới</h3>
+            <div class="form-group">
+                <label>Tên danh mục (VD: Căn hộ cao cấp)</label>
+                <input type="text" id="cat-name" placeholder="Nhập tên danh mục...">
+            </div>
+            <div class="form-group">
+                <label>Mô tả ngắn</label>
+                <textarea id="cat-desc" rows="2" placeholder="Nhập mô tả..."></textarea>
+            </div>
+            <button class="btn-save" onclick="saveCategory()">Lưu danh mục</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Thứ tự</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="category-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = '/api/Category';
+
+        document.addEventListener("DOMContentLoaded", loadCategories);
+
+        // 1. Lấy danh sách danh mục
+        async function loadCategories() {
+            try {
+                const response = await fetch(API_URL);
+                const categories = await response.json();
+                const tbody = document.getElementById('category-table-body');
+
+                tbody.innerHTML = categories.map((cat, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td style="font-weight:bold;">${cat.name}</td>
+                        <td>${cat.description || ''}</td>
+                        <td class="actions">
+                            <button class="btn-delete" onclick="deleteCategory('${cat.id}')">
+                                <i class="fas fa-trash-alt"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Lỗi tải danh mục:", err);
+            }
+        }
+
+        // 2. Thêm danh mục mới
+        async function saveCategory() {
+            const name = document.getElementById('cat-name').value;
+            const description = document.getElementById('cat-desc').value;
+
+            if (!name) return alert("Vui lòng nhập tên danh mục!");
+
+            const newCat = { name, description, displayOrder: 0 };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newCat)
+                });
+
+                if (response.ok) {
+                    alert("Đã thêm danh mục thành công!");
+                    document.getElementById('cat-name').value = '';
+                    document.getElementById('cat-desc').value = '';
+                    loadCategories();
+                }
+            } catch (err) {
+                alert("Lỗi khi lưu!");
+            }
+        }
+
+        // 3. Xóa danh mục
+        async function deleteCategory(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    loadCategories();
+                }
+            } catch (err) {
+                alert("Lỗi khi xóa!");
+            }
+        }
+    </script>
+</body>
+</html>
