@@ -33,12 +33,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// 5. Cấu hình HTTP request pipeline (Giữ nguyên các file tĩnh và Swagger)
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 app.UseHttpsRedirection();
 
