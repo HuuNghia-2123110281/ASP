@@ -145,6 +145,7 @@
                 <input type="number" id="gia" placeholder="VD: 4500000000">
             </div>
         </div>
+
         <div class="row">
             <div class="col form-group">
                 <label>Diện tích (m²) <span style="color:red">*</span></label>
@@ -165,6 +166,7 @@
             <label>Mô tả chi tiết</label>
             <textarea id="moTa" rows="5" placeholder="Nhập mô tả chi tiết về số phòng ngủ, nội thất, pháp lý..."></textarea>
         </div>
+
         <div class="form-group">
             <label>Hình ảnh thực tế <span style="color:red">*</span></label>
             <input type="file" id="hinhAnh" accept="image/png, image/jpeg, image/jpg" required>
@@ -191,39 +193,43 @@
             const btn = document.querySelector('.submit-btn');
             const msg = document.getElementById('message');
 
+            // Lấy giá trị từ các ô input
             const tieuDe = document.getElementById('tieuDe').value.trim();
             const loaiHinh = document.getElementById('loaiHinh').value;
             const gia = document.getElementById('gia').value;
-            formData.append("DienTich", document.getElementById('dienTich').value);
-            formData.append("PhongNgu", document.getElementById('phongNgu').value);
+            const dienTich = document.getElementById('dienTich').value;
+            const phongNgu = document.getElementById('phongNgu').value;
             const diaChi = document.getElementById('diaChi').value.trim();
             const moTa = document.getElementById('moTa').value.trim();
             const fileInput = document.getElementById('hinhAnh');
 
-            // 1. Validate dữ liệu
+            // Validate dữ liệu bắt buộc
             if (!tieuDe || !gia || !diaChi || fileInput.files.length === 0) {
                 msg.style.color = "red";
                 msg.innerText = "Vui lòng nhập đầy đủ thông tin và chọn hình ảnh!";
                 return;
             }
 
-            // 2. Dùng FormData để chứa File và Chữ (Bắt buộc phải dùng cái này C# mới hiểu)
+            // Khởi tạo FormData
             const formData = new FormData();
+
+            // Nhét dữ liệu vào FormData
             formData.append("TieuDe", tieuDe);
             formData.append("LoaiHinh", loaiHinh);
             formData.append("Gia", gia);
+            formData.append("DienTich", dienTich || 0); // Nếu trống thì gửi số 0
+            formData.append("PhongNgu", phongNgu || 0); // Nếu trống thì gửi số 0
             formData.append("DiaChi", diaChi);
             formData.append("MoTa", moTa);
             formData.append("HinhAnhFile", fileInput.files[0]); // Đính kèm file hình
 
+            // Đổi trạng thái nút bấm
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải ảnh lên...';
             btn.style.background = "#6c757d";
             btn.disabled = true;
 
             try {
-                // 3. Gửi FormData lên C# 
-                // LƯU Ý CỰC KỲ QUAN TRỌNG: Tuyệt đối KHÔNG ĐƯỢC để dòng headers: {'Content-Type': '...'} ở đây.
-                // Trình duyệt sẽ tự động biết cách đóng gói FormData cho chuẩn.
+                // Gửi FormData lên C# (Không dùng Content-Type header)
                 const response = await fetch('/api/BatDongSan', {
                     method: 'POST',
                     body: formData
