@@ -20,5 +20,8 @@ namespace asp.Data
 
         [BsonElement("Email")]
         public string? Email { get; set; }
+
+        [BsonElement("Role")]
+        public string? Role { get; set; }
     }
 }
