@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa BĐS - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #202124;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+        }
+
+        header {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                box-sizing: border-box;
+            }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #ffc107;
+            color: black;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #current-img-preview {
+            width: 200px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: block;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA - CHỈNH SỬA</a>
+        <a href="index.html" style="color: var(--dark); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Hủy và quay lại</a>
+    </header>
+
+    <div class="form-container">
+        <h2 style="text-align: center;"><i class="fas fa-edit"></i> CẬP NHẬT THÔNG TIN</h2>
+
+        <div class="form-group">
+            <label>Tiêu đề bài đăng</label>
+            <input type="text" id="tieuDe">
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label>Loại hình</label>
+                <select id="loaiHinh">
+                    <option value="Căn hộ">Căn hộ</option>
+                    <option value="Nhà phố">Nhà phố</option>
+                    <option value="Biệt thự">Biệt thự</option>
+                    <option value="Đất nền">Đất nền</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label>Mức giá (VNĐ)</label>
+                <input type="number" id="gia">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label>Diện tích (m²)</label>
+                <input type="number" id="dienTich">
+            </div>
+            <div class="col form-group">
+                <label>Số phòng ngủ</label>
+                <input type="number" id="phongNgu">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Địa chỉ</label>
+            <input type="text" id="diaChi">
+        </div>
+
+        <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea id="moTa" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Hình ảnh hiện tại</label>
+            <img id="current-img-preview" src="" alt="Chưa có ảnh">
+            <label style="margin-top: 15px;">Thay đổi ảnh mới (Để trống nếu giữ nguyên)</label>
+            <input type="file" id="hinhAnh" accept="image/*">
+        </div>
+
+        <button class="submit-btn" onclick="updateProperty()">LƯU THAY ĐỔI</button>
+        <p id="message" style="text-align:center; margin-top:15px; font-weight:bold;"></p>
+    </div>
+
+    <script>
+        let currentId = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Kiểm tra quyền
+            const role = localStorage.getItem("role");
+            if (role !== "Admin" && role !== "Sales") {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 2. Lấy ID từ URL và tải dữ liệu
+            const urlParams = new URLSearchParams(window.location.search);
+            currentId = urlParams.get('id');
+            if (currentId) {
+                loadOldData(currentId);
+            }
+        });
+
+        async function loadOldData(id) {
+            try {
+                const response = await fetch(`/api/BatDongSan/${id}`);
+                const data = await response.json();
+
+                document.getElementById('tieuDe').value = data.tieuDe;
+                document.getElementById('loaiHinh').value = data.loaiHinh;
+                document.getElementById('gia').value = data.gia;
+                document.getElementById('diaChi').value = data.diaChi;
+                document.getElementById('moTa').value = data.moTa || "";
+                document.getElementById('dienTich').value = data.dienTich || 0;
+                document.getElementById('phongNgu').value = data.phongNgu || 0;
+
+                if (data.hinhAnhUrl) {
+                    document.getElementById('current-img-preview').src = data.hinhAnhUrl;
+                }
+            } catch (err) {
+                alert("Không thể tải dữ liệu cũ!");
+            }
+        }
+
+        async function updateProperty() {
+            const msg = document.getElementById('message');
+            const fileInput = document.getElementById('hinhAnh');
+
+            const formData = new FormData();
+            formData.append("TieuDe", document.getElementById('tieuDe').value);
+            formData.append("LoaiHinh", document.getElementById('loaiHinh').value);
+            formData.append("Gia", document.getElementById('gia').value);
+            formData.append("DiaChi", document.getElementById('diaChi').value);
+            formData.append("MoTa", document.getElementById('moTa').value);
+            formData.append("DienTich", document.getElementById('dienTich').value);
+            formData.append("PhongNgu", document.getElementById('phongNgu').value);
+
+            if (fileInput.files[0]) {
+                formData.append("HinhAnhFile", fileInput.files[0]);
+            }
+
+            msg.style.color = "blue";
+            msg.innerText = "Đang cập nhật...";
+
+            try {
+                // Gửi yêu cầu PUT lên API
+                const response = await fetch(`/api/BatDongSan/${currentId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    msg.style.color = "green";
+                    msg.innerText = "✅ Cập nhật thành công!";
+                    setTimeout(() => { window.location.href = `detail.html?id=${currentId}`; }, 1500);
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = "Lỗi khi cập nhật!";
+                }
+            } catch (error) {
+                msg.style.color = "red";
+                msg.innerText = "Lỗi kết nối server!";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -68,7 +68,7 @@
 
         .address {
             color: var(--gray);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 18px;
         }
 
@@ -150,40 +150,54 @@
                 if (!response.ok) throw new Error("Không lấy được dữ liệu");
 
                 const item = await response.json();
-
-
                 const container = document.getElementById('detail-content');
-                const randomImg = `https://loremflickr.com/1000/600/villa,mansion?lock=${item.id}`;
+
+                // VẤN ĐỀ 1: Ưu tiên dùng ảnh thật (hinhAnhUrl), nếu không có mới dùng ảnh mặc định
+                const realImg = item.hinhAnhUrl ? item.hinhAnhUrl : `https://loremflickr.com/1000/600/house?lock=${item.id}`;
 
                 container.innerHTML = `
-                    <img src="${randomImg}" class="main-img" alt="BĐS">
-                    <div class="content">
-                        <div class="price">${item.gia.toLocaleString('vi-VN')} VNĐ</div>
-                        <h1 class="title">${item.tieuDe}</h1>
-                        <div class="address"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</div>
+                        <img src="${realImg}" class="main-img" alt="BĐS">
+                        <div class="content">
+                            <div class="price">${item.gia.toLocaleString('vi-VN')} VNĐ</div>
+                            <h1 class="title">${item.tieuDe}</h1>
+                            <div class="address"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</div>
 
-                        <div class="specs">
-                            <div class="spec-item"><i class="fas fa-home"></i><p>Loại hình</p><div>${item.loaiHinh}</div></div>
-                            <div class="spec-item"><i class="fas fa-bed"></i><p>Phòng ngủ</p><div>2 PN</div></div>
-                            <div class="spec-item"><i class="fas fa-expand-arrows-alt"></i><p>Diện tích</p><div>85 m²</div></div>
-                        </div>
+                            <div id="admin-actions" style="margin-bottom: 25px;"></div>
 
-                        <div class="description">
-                            <h3>Mô tả chi tiết</h3>
-                            <p>${item.moTa || "Thông tin mô tả đang được cập nhật cho căn bất động sản này..."}</p>
-                        </div>
-
-                        <div class="contact-box">
-                            <div>
-                                <h4 style="margin:0">Liên hệ nhân viên kinh doanh</h4>
-                                <p style="margin:5px 0 0 0; color:var(--gray)">Hỗ trợ tư vấn pháp lý và xem nhà 24/7</p>
+                            <div class="specs">
+                                <div class="spec-item"><i class="fas fa-home"></i><p>Loại hình</p><div>${item.loaiHinh}</div></div>
+                                <div class="spec-item"><i class="fas fa-bed"></i><p>Phòng ngủ</p><div>${item.phongNgu || 0} PN</div></div>
+                                <div class="spec-item"><i class="fas fa-expand-arrows-alt"></i><p>Diện tích</p><div>${item.dienTich || 0} m²</div></div>
                             </div>
-                            <a href="tel:0901234567" class="btn-call"><i class="fas fa-phone-alt"></i> Gọi ngay</a>
+
+                            <div class="description">
+                                <h3>Mô tả chi tiết</h3>
+                                <p>${item.moTa || "Thông tin mô tả đang được cập nhật cho căn bất động sản này..."}</p>
+                            </div>
+
+                            <div class="contact-box">
+                                <div>
+                                    <h4 style="margin:0">Liên hệ nhân viên kinh doanh</h4>
+                                    <p style="margin:5px 0 0 0; color:var(--gray)">Hỗ trợ tư vấn pháp lý và xem nhà 24/7</p>
+                                </div>
+                                <a href="tel:0901234567" class="btn-call"><i class="fas fa-phone-alt"></i> Gọi ngay</a>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+
+                // XỬ LÝ PHÂN QUYỀN HIỆN NÚT SỬA
+                const role = localStorage.getItem("role");
+                if (role === "Admin" || role === "Sales") {
+                    document.getElementById("admin-actions").innerHTML = `
+                            <a href="edit-property.html?id=${item.id}"
+                               style="background-color: #ffc107; color: #000; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                               <i class="fas fa-edit"></i> Chỉnh sửa thông tin BĐS
+                            </a>
+                        `;
+                }
+
             } catch (err) {
-                document.getElementById('detail-content').innerHTML = `<p style="color:red; padding:50px;">Lỗi: ${err.message}</p>`;
+                document.getElementById('detail-content').innerHTML = `<p style="color:red; padding:50px; text-align:center;">Lỗi: ${err.message}</p>`;
             }
         }
     </script>

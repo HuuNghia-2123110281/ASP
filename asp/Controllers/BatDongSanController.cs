@@ -83,6 +83,8 @@ namespace asp.Controllers
                 {
                     TieuDe = request.TieuDe,
                     LoaiHinh = request.LoaiHinh,
+                    DienTich = request.DienTich,
+                    PhongNgu = request.PhongNgu,
                     Gia = request.Gia,
                     DiaChi = request.DiaChi,
                     MoTa = request.MoTa,
@@ -98,13 +100,42 @@ namespace asp.Controllers
             }
         }
 
-        // 4. Sửa BĐS (Giữ nguyên của Nghĩa)
+        // 4. Sửa BĐS
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBatDongSan(string id, BatDongSan updatedBds)
+        public async Task<IActionResult> PutBatDongSan(string id, [FromForm] BatDongSanRequest request)
         {
-            var result = await _bdsCollection.ReplaceOneAsync(x => x.Id == id, updatedBds);
-            if (result.MatchedCount == 0) return NotFound();
-            return Ok(updatedBds);
+            var existingBds = await _bdsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (existingBds == null) return NotFound();
+
+            // 1. Giữ nguyên ảnh cũ nếu không up ảnh mới
+            string? hinhAnhUrl = existingBds.HinhAnhUrl;
+
+            // 2. Nếu có up ảnh mới thì xử lý lưu ảnh
+            if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + request.HinhAnhFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.HinhAnhFile.CopyToAsync(fileStream);
+                }
+                hinhAnhUrl = "/images/" + uniqueFileName;
+            }
+
+            // 3. Cập nhật dữ liệu mới
+            existingBds.TieuDe = request.TieuDe;
+            existingBds.LoaiHinh = request.LoaiHinh;
+            existingBds.Gia = request.Gia;
+            existingBds.DiaChi = request.DiaChi;
+            existingBds.MoTa = request.MoTa;
+            existingBds.DienTich = request.DienTich;
+            existingBds.PhongNgu = request.PhongNgu;
+            existingBds.HinhAnhUrl = hinhAnhUrl;
+
+            await _bdsCollection.ReplaceOneAsync(x => x.Id == id, existingBds);
+            return Ok(new { message = "Cập nhật thành công!", data = existingBds });
         }
 
         // 5. Xóa BĐS (Giữ nguyên của Nghĩa)

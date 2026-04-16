@@ -6,9 +6,12 @@ namespace asp.Data
     {
         public string TieuDe { get; set; } = null!;
         public string LoaiHinh { get; set; } = null!;
+        public double DienTich { get; set; }
+        public int PhongNgu { get; set; }
         public double Gia { get; set; }
         public string DiaChi { get; set; } = null!;
         public string? MoTa { get; set; }
         public IFormFile? HinhAnhFile { get; set; }
+
     }
 }

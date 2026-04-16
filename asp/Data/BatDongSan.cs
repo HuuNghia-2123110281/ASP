@@ -14,6 +14,8 @@ namespace asp.Data
         public string? MoTa { get; set; }
         public double Gia { get; set; }
         public string LoaiHinh { get; set; }
+        public double DienTich { get; set; }
+        public int PhongNgu { get; set; }
         public string? HinhAnhUrl { get; set; }
     }
 }
