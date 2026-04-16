@@ -50,6 +50,7 @@ try
     app.UseCors("AllowAll");
     app.UseAuthorization();
     app.MapControllers();
+    app.UseStaticFiles();
 
     Console.WriteLine(">>> [3] KHOI DONG THANH CONG, CHUAN BI RUN...");
     app.Run();

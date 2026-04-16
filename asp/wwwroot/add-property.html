@@ -155,6 +155,11 @@
             <label>Mô tả chi tiết</label>
             <textarea id="moTa" rows="5" placeholder="Nhập mô tả chi tiết về số phòng ngủ, nội thất, pháp lý..."></textarea>
         </div>
+        <div class="form-group">
+            <label>Hình ảnh thực tế <span style="color:red">*</span></label>
+            <input type="file" id="hinhAnh" accept="image/png, image/jpeg, image/jpg" required>
+            <small style="color: #666;">Thêm hình ảnh thực tế dự án</small>
+        </div>
 
         <button class="submit-btn" onclick="submitProperty()"><i class="fas fa-upload"></i> XUẤT BẢN TIN LÊN WEB</button>
         <p id="message"></p>
