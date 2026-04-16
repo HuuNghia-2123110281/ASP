@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng tin BĐS - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #202124;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+        }
+
+        /* HEADER */
+        header {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        /* FORM CONTAINER */
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+            .form-container h2 {
+                text-align: center;
+                color: var(--dark);
+                margin-bottom: 30px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: #333;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                font-size: 16px;
+                box-sizing: border-box;
+                outline: none;
+                transition: 0.3s;
+            }
+
+                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                    border-color: var(--primary);
+                    box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
+                }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+            .submit-btn:hover {
+                background: #218838;
+            }
+
+        #message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA - SALES PANEL</a>
+        <a href="index.html" style="color: var(--dark); text-decoration: none; font-weight: bold;">
+            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+    </header>
+
+    <div class="form-container">
+        <h2><i class="fas fa-edit"></i> ĐĂNG TIN NHÀ ĐẤT MỚI</h2>
+
+        <div class="form-group">
+            <label>Tiêu đề bài đăng <span style="color:red">*</span></label>
+            <input type="text" id="tieuDe" placeholder="VD: Bán gấp căn hộ cao cấp Vinhomes...">
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label>Loại hình <span style="color:red">*</span></label>
+                <select id="loaiHinh">
+                    <option value="Căn hộ">Căn hộ chung cư</option>
+                    <option value="Nhà phố">Nhà phố / Liền kề</option>
+                    <option value="Biệt thự">Biệt thự</option>
+                    <option value="Đất nền">Đất nền dự án</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label>Mức giá (VNĐ) <span style="color:red">*</span></label>
+                <input type="number" id="gia" placeholder="VD: 4500000000">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Địa chỉ cụ thể <span style="color:red">*</span></label>
+            <input type="text" id="diaChi" placeholder="VD: Phường 22, Quận Bình Thạnh, TP.HCM">
+        </div>
+
+        <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea id="moTa" rows="5" placeholder="Nhập mô tả chi tiết về số phòng ngủ, nội thất, pháp lý..."></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitProperty()"><i class="fas fa-upload"></i> XUẤT BẢN TIN LÊN WEB</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        // 1. KIỂM TRA PHÂN QUYỀN (BẢO VỆ TRANG)
+        document.addEventListener("DOMContentLoaded", () => {
+            const role = localStorage.getItem("role");
+            // Nếu không phải Admin và không phải Sales thì đuổi về trang chủ
+            if (role !== "Admin" && role !== "Sales") {
+                alert("⛔ Cảnh báo: Bạn không có quyền truy cập trang Quản lý Đăng tin!");
+                window.location.href = "index.html";
+            }
+        });
+
+        // 2. XỬ LÝ GỬI DỮ LIỆU LÊN API
+        async function submitProperty() {
+            const btn = document.querySelector('.submit-btn');
+            const msg = document.getElementById('message');
+
+            // Gom dữ liệu từ Form
+            const propertyData = {
+                tieuDe: document.getElementById('tieuDe').value.trim(),
+                loaiHinh: document.getElementById('loaiHinh').value,
+                gia: parseFloat(document.getElementById('gia').value),
+                diaChi: document.getElementById('diaChi').value.trim(),
+                moTa: document.getElementById('moTa').value.trim()
+            };
+
+            // Validate sơ bộ
+            if (!propertyData.tieuDe || !propertyData.gia || !propertyData.diaChi) {
+                msg.style.color = "red";
+                msg.innerText = "Vui lòng nhập đầy đủ Tiêu đề, Giá và Địa chỉ!";
+                return;
+            }
+
+            // Đổi giao diện nút bấm cho chuyên nghiệp
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            btn.style.background = "#6c757d";
+            btn.disabled = true;
+
+            try {
+                // Gọi thẳng tới Backend C# của bạn
+                const response = await fetch('/api/BatDongSan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(propertyData)
+                });
+
+                if (response.ok) {
+                    msg.style.color = "green";
+                    msg.innerText = "🎉 Đăng tin thành công! Hệ thống sẽ chuyển về trang chủ...";
+
+                    // Đợi 2 giây rồi chuyển hướng để người dùng kịp đọc thông báo
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 2000);
+                } else {
+                    const result = await response.json();
+                    msg.style.color = "red";
+                    msg.innerText = "Lỗi: " + (result.message || "Không thể lưu dữ liệu!");
+                    resetButton(btn);
+                }
+            } catch (error) {
+                console.error(error);
+                msg.style.color = "red";
+                msg.innerText = "Lỗi kết nối đến máy chủ Render!";
+                resetButton(btn);
+            }
+        }
+
+        function resetButton(btn) {
+            btn.innerHTML = '<i class="fas fa-upload"></i> XUẤT BẢN TIN LÊN WEB';
+            btn.style.background = "#28a745";
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
