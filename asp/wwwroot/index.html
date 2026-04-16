@@ -254,24 +254,28 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const fullName = localStorage.getItem("username");
-            const role = localStorage.getItem("role"); // Lấy chức vụ
+            const role = localStorage.getItem("role");
             const authSection = document.getElementById("auth-section");
 
             if (fullName) {
-                // Hiển thị tên người dùng
+                // 1. Hiển thị tên người dùng đã đăng nhập
                 let menuHTML = `<span style="font-size: 18px; font-weight:600;"><i class="fas fa-user"></i> ${fullName}</span>`;
 
-                // PHÂN QUYỀN GIAO DIỆN
+                // 2. PHÂN QUYỀN ĐIỀU HƯỚNG
                 if (role === "Admin") {
-                    menuHTML += `<a href="admin-dashboard.html" style="margin-left:15px; font-size:18px; color: #e91e63;"><i class="fas fa-cogs"></i> Quản trị</a>`;
-                } else if (role === "Sales") {
                     menuHTML += `
-                            <a href="add-property.html" style="margin-left:15px; font-size:18px; color: #28a745;"><i class="fas fa-plus-circle"></i> Đăng tin</a>
-                            <a href="manage-clients.html" style="margin-left:15px; font-size:18px; color: #1a73e8;"><i class="fas fa-users"></i> Khách hàng</a>
-                        `;
+                <a href="admin-dashboard.html" style="margin-left:15px; font-size:18px; color: #e91e63;"><i class="fas fa-cogs"></i> Quản trị</a>
+                <a href="add-property.html" style="margin-left:15px; font-size:18px; color: #28a745;"><i class="fas fa-plus-circle"></i> Đăng tin</a>
+            `;
+                }
+                else if (role === "Sales") {
+                    menuHTML += `
+                <a href="add-property.html" style="margin-left:15px; font-size:18px; color: #28a745;"><i class="fas fa-plus-circle"></i> Đăng tin</a>
+                <a href="manage-clients.html" style="margin-left:15px; font-size:18px; color: #1a73e8;"><i class="fas fa-users"></i> Khách hàng</a>
+            `;
                 }
 
-                // Nút đăng xuất (Dành cho tất cả)
+                // 3. Nút đăng xuất dùng chung cho tất cả
                 menuHTML += `<a href="#" class="logout-btn" onclick="logout()" style="font-size:18px; margin-left:15px; border-left: 1px solid #ccc; padding-left: 15px;">Thoát</a>`;
 
                 authSection.innerHTML = menuHTML;
