@@ -181,43 +181,47 @@
             const btn = document.querySelector('.submit-btn');
             const msg = document.getElementById('message');
 
-            // Gom dữ liệu từ Form
-            const propertyData = {
-                tieuDe: document.getElementById('tieuDe').value.trim(),
-                loaiHinh: document.getElementById('loaiHinh').value,
-                gia: parseFloat(document.getElementById('gia').value),
-                diaChi: document.getElementById('diaChi').value.trim(),
-                moTa: document.getElementById('moTa').value.trim()
-            };
+            const tieuDe = document.getElementById('tieuDe').value.trim();
+            const loaiHinh = document.getElementById('loaiHinh').value;
+            const gia = document.getElementById('gia').value;
+            const diaChi = document.getElementById('diaChi').value.trim();
+            const moTa = document.getElementById('moTa').value.trim();
+            const fileInput = document.getElementById('hinhAnh');
 
-            // Validate sơ bộ
-            if (!propertyData.tieuDe || !propertyData.gia || !propertyData.diaChi) {
+            // 1. Validate dữ liệu
+            if (!tieuDe || !gia || !diaChi || fileInput.files.length === 0) {
                 msg.style.color = "red";
-                msg.innerText = "Vui lòng nhập đầy đủ Tiêu đề, Giá và Địa chỉ!";
+                msg.innerText = "Vui lòng nhập đầy đủ thông tin và chọn hình ảnh!";
                 return;
             }
 
-            // Đổi giao diện nút bấm cho chuyên nghiệp
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            // 2. Dùng FormData để chứa File và Chữ (Bắt buộc phải dùng cái này C# mới hiểu)
+            const formData = new FormData();
+            formData.append("TieuDe", tieuDe);
+            formData.append("LoaiHinh", loaiHinh);
+            formData.append("Gia", gia);
+            formData.append("DiaChi", diaChi);
+            formData.append("MoTa", moTa);
+            formData.append("HinhAnhFile", fileInput.files[0]); // Đính kèm file hình
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải ảnh lên...';
             btn.style.background = "#6c757d";
             btn.disabled = true;
 
             try {
-                // Gọi thẳng tới Backend C# của bạn
+                // 3. Gửi FormData lên C# 
+                // LƯU Ý CỰC KỲ QUAN TRỌNG: Tuyệt đối KHÔNG ĐƯỢC để dòng headers: {'Content-Type': '...'} ở đây.
+                // Trình duyệt sẽ tự động biết cách đóng gói FormData cho chuẩn.
                 const response = await fetch('/api/BatDongSan', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(propertyData)
+                    body: formData
                 });
 
                 if (response.ok) {
                     msg.style.color = "green";
-                    msg.innerText = "🎉 Đăng tin thành công! Hệ thống sẽ chuyển về trang chủ...";
-
-                    // Đợi 2 giây rồi chuyển hướng để người dùng kịp đọc thông báo
-                    setTimeout(() => {
-                        window.location.href = "index.html";
-                    }, 2000);
+                    msg.innerText = "🎉 Đăng tin & tải ảnh thành công!";
+                    // Đợi 2 giây rồi về trang chủ xem thành quả
+                    setTimeout(() => { window.location.href = "index.html"; }, 2000);
                 } else {
                     const result = await response.json();
                     msg.style.color = "red";
@@ -227,7 +231,7 @@
             } catch (error) {
                 console.error(error);
                 msg.style.color = "red";
-                msg.innerText = "Lỗi kết nối đến máy chủ Render!";
+                msg.innerText = "Lỗi kết nối đến máy chủ!";
                 resetButton(btn);
             }
         }
