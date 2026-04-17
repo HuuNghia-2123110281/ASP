@@ -47,7 +47,6 @@
             padding: 0 20px;
         }
 
-        /* Chia 2 cột cho phần nhập liệu */
         .top-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -78,7 +77,7 @@
             margin-bottom: 15px;
         }
 
-            .form-group input, .form-group select {
+            .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="datetime-local"], .form-group select {
                 width: 100%;
                 padding: 10px;
                 border: 1px solid #ccc;
@@ -90,6 +89,27 @@
                 .form-group input:focus, .form-group select:focus {
                     border-color: var(--primary);
                 }
+
+        /* Style cho nút Radio chọn loại khách */
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+            .radio-group label {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 14px;
+                color: var(--dark);
+            }
 
         .btn-add {
             background: var(--success);
@@ -112,7 +132,6 @@
             color: black;
         }
 
-        /* Bảng dữ liệu */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -208,11 +227,22 @@
 
             <div class="add-box yellow-border">
                 <h3><i class="fas fa-calendar-check"></i> Sales Đặt Lịch Hẹn</h3>
-                <div class="form-group">
+
+                <div class="radio-group">
+                    <label><input type="radio" name="cusType" value="crm" checked onchange="toggleCusInput()"> Khách từ hệ thống CRM</label>
+                    <label><input type="radio" name="cusType" value="account" onchange="toggleCusInput()"> Khách đã có tài khoản</label>
+                </div>
+
+                <div class="form-group" id="crmCusBox">
                     <select id="selectCusId">
                         <option value="">-- Chọn khách hàng từ hệ thống --</option>
                     </select>
                 </div>
+
+                <div class="form-group" id="accountCusBox" style="display: none;">
+                    <input type="text" id="inputUsername" placeholder="Nhập chính xác Tên đăng nhập của khách...">
+                </div>
+
                 <div class="form-group">
                     <select id="selectPropId">
                         <option value="">-- Chọn Dự án / Căn nhà --</option>
@@ -221,7 +251,7 @@
                 <div class="form-group">
                     <input type="datetime-local" id="appDate" title="Ngày giờ hẹn">
                 </div>
-                <button class="btn-add btn-book" onclick="createAppointment()"><i class="fas fa-paper-plane"></i> TẠO LỊCH HẸN CHO KHÁCH</button>
+                <button class="btn-add btn-book" onclick="createAppointment()"><i class="fas fa-paper-plane"></i> TẠO LỊCH HẸN</button>
                 <p id="msgApp" style="margin:10px 0 0 0; font-weight:bold; font-size:14px;"></p>
             </div>
         </div>
@@ -254,11 +284,21 @@
                 window.location.href = "index.html";
                 return;
             }
-            // Khởi chạy tải tất cả dữ liệu
             loadAllData();
         });
 
-        // 1. TẢI TẤT CẢ DỮ LIỆU ĐỂ BẮT VÀO DROPDOWN VÀ BẢNG
+        // CHUYỂN ĐỔI Ô NHẬP LIỆU KHÁCH HÀNG
+        function toggleCusInput() {
+            const type = document.querySelector('input[name="cusType"]:checked').value;
+            if (type === 'crm') {
+                document.getElementById('crmCusBox').style.display = 'block';
+                document.getElementById('accountCusBox').style.display = 'none';
+            } else {
+                document.getElementById('crmCusBox').style.display = 'none';
+                document.getElementById('accountCusBox').style.display = 'block';
+            }
+        }
+
         async function loadAllData() {
             try {
                 const [resCus, resProp] = await Promise.all([
@@ -269,24 +309,20 @@
                 customersList = await resCus.json();
                 propertiesList = await resProp.json();
 
-                // Cập nhật Dropdown Khách hàng
                 let cusHtml = '<option value="">-- Chọn khách hàng từ hệ thống --</option>';
                 customersList.forEach(c => cusHtml += `<option value="${c.id}">${c.name} - ${c.phone}</option>`);
                 document.getElementById('selectCusId').innerHTML = cusHtml;
 
-                // Cập nhật Dropdown Dự án
                 let propHtml = '<option value="">-- Chọn Dự án / Căn nhà --</option>';
                 propertiesList.forEach(p => propHtml += `<option value="${p.id}">${p.tieuDe}</option>`);
                 document.getElementById('selectPropId').innerHTML = propHtml;
 
-                // Tải bảng lịch hẹn
                 loadAppointments();
             } catch (err) {
                 console.error("Lỗi tải dữ liệu", err);
             }
         }
 
-        // 2. LƯU HỒ SƠ KHÁCH HÀNG MỚI
         async function addCustomer() {
             const msg = document.getElementById('msgCus');
             const data = {
@@ -310,13 +346,11 @@
                 });
 
                 if (response.ok) {
-                    msg.style.color = "green"; msg.innerText = "✅ Lưu khách hàng thành công!";
+                    msg.style.color = "green"; msg.innerText = "✅ Lưu thành công!";
                     document.getElementById('cusName').value = '';
                     document.getElementById('cusPhone').value = '';
                     document.getElementById('cusEmail').value = '';
                     document.getElementById('cusDemand').value = '';
-
-                    // Tải lại dữ liệu để khách hàng vừa thêm xuất hiện ngay trong Dropdown chọn lịch!
                     loadAllData();
                     setTimeout(() => msg.innerText = "", 3000);
                 } else {
@@ -327,18 +361,27 @@
             }
         }
 
-        // 3. SALES ĐẶT LỊCH HẸN
         async function createAppointment() {
             const msg = document.getElementById('msgApp');
+            const cusType = document.querySelector('input[name="cusType"]:checked').value;
+
+            // XÁC ĐỊNH ID KHÁCH HÀNG DỰA VÀO LỰA CHỌN CỦA SALES
+            let finalCustomerId = "";
+            if (cusType === 'crm') {
+                finalCustomerId = document.getElementById('selectCusId').value;
+            } else {
+                finalCustomerId = document.getElementById('inputUsername').value.trim();
+            }
+
             const data = {
-                customerId: document.getElementById('selectCusId').value,
+                customerId: finalCustomerId,
                 propertyId: document.getElementById('selectPropId').value,
                 appointmentDate: document.getElementById('appDate').value,
-                userId: localStorage.getItem("username") // Gắn ID Sales
+                userId: localStorage.getItem("username")
             };
 
             if (!data.customerId || !data.propertyId || !data.appointmentDate) {
-                msg.style.color = "red"; msg.innerText = "Vui lòng chọn khách, nhà và giờ!"; return;
+                msg.style.color = "red"; msg.innerText = "Vui lòng chọn/nhập đủ thông tin!"; return;
             }
 
             msg.style.color = "blue"; msg.innerText = "Đang đặt lịch...";
@@ -351,8 +394,9 @@
                 });
                 if (res.ok) {
                     msg.style.color = "green"; msg.innerText = "✅ Tạo lịch thành công!";
-                    document.getElementById('appDate').value = ""; // Xóa form ngày
-                    loadAppointments(); // Cập nhật lại bảng ngay lập tức
+                    document.getElementById('appDate').value = "";
+                    if (cusType === 'account') document.getElementById('inputUsername').value = ""; // Xóa form nếu dùng username
+                    loadAppointments();
                     setTimeout(() => msg.innerText = "", 3000);
                 }
             } catch (err) {
@@ -360,7 +404,6 @@
             }
         }
 
-        // 4. HIỂN THỊ BẢNG LỊCH HẸN
         function loadAppointments() {
             fetch('/api/Appointment')
                 .then(res => res.json())
@@ -370,11 +413,13 @@
                         html = '<tr><td colspan="5" style="text-align: center;">Chưa có lịch hẹn nào.</td></tr>';
                     } else {
                         data.forEach(a => {
-                            // Ánh xạ dữ liệu ID ra Tên
-                            const cus = customersList.find(c => c.id === a.customerId) || { name: `<strong>${a.customerId}</strong>`, phone: '<span style="color:var(--success)">Khách tự đặt trên Web</span>' };
+                            // XỬ LÝ HIỂN THỊ THÔNG MINH: Nếu không có trong CRM, tự động hiểu là Thành viên
+                            const cus = customersList.find(c => c.id === a.customerId) || {
+                                name: `Tài khoản: <strong style="color:var(--primary)">${a.customerId}</strong>`,
+                                phone: '<span style="color:var(--success)"><i class="fas fa-globe"></i> Thành viên Website</span>'
+                            };
                             const prop = propertiesList.find(p => p.id === a.propertyId) || { tieuDe: 'BĐS đã bị xóa/ẩn' };
 
-                            // Màu sắc trạng thái
                             let statusClass = "cho-xac-nhan";
                             if (a.status === "Đã xem" || a.status === "Đã xem nhà") statusClass = "da-xem";
                             if (a.status === "Hủy" || a.status === "Đã hủy") statusClass = "da-huy";
@@ -385,8 +430,8 @@
                             html += `
                                     <tr>
                                         <td>
-                                            <div style="font-size:16px;">${cus.name}</div>
-                                            <small style="color:#666;"><i class="fas fa-phone-alt"></i> ${cus.phone}</small>
+                                            <div style="font-size:15px;">${cus.name}</div>
+                                            <small style="color:#666;">${cus.phone}</small>
                                         </td>
                                         <td style="color: var(--primary); font-weight: bold; font-size: 15px;">${prop.tieuDe}</td>
                                         <td><i class="far fa-clock"></i> ${formattedDate}</td>
@@ -405,7 +450,6 @@
                 });
         }
 
-        // 5. CẬP NHẬT TRẠNG THÁI LỊCH (CHỐT / HỦY)
         async function updateStatus(id, newStatus) {
             if (!confirm(`Xác nhận chuyển trạng thái thành: ${newStatus}?`)) return;
             try {
