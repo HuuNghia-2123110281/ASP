@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using asp.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace asp.Controllers
 {
@@ -15,16 +17,41 @@ namespace asp.Controllers
             _transactionCollection = database.GetCollection<Transaction>("Transactions");
         }
 
-        // Lấy danh sách giao dịch (Module 8.3)
+        // 1. Lấy danh sách giao dịch (Ưu tiên mới nhất lên đầu)
         [HttpGet]
-        public async Task<List<Transaction>> Get() => await _transactionCollection.Find(_ => true).ToListAsync();
+        public async Task<ActionResult<IEnumerable<Transaction>>> Get()
+        {
+            var list = await _transactionCollection.Find(_ => true)
+                .SortByDescending(t => t.Date)
+                .ToListAsync();
+            return Ok(list);
+        }
 
-        // Tạo giao dịch mới (Module 5.3.1)
+        // 2. Tạo giao dịch mới (Module 5.3.1)
         [HttpPost]
         public async Task<IActionResult> Post(Transaction transaction)
         {
+            transaction.Date = System.DateTime.Now;
+            if (string.IsNullOrEmpty(transaction.Status))
+            {
+                transaction.Status = "Đang xử lý";
+            }
+
             await _transactionCollection.InsertOneAsync(transaction);
-            return Ok(transaction);
+            return Ok(new { message = "Tạo giao dịch thành công", data = transaction });
+        }
+
+        // 3. Cập nhật trạng thái giao dịch (Hoàn tất / Hủy)
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromBody] string newStatus)
+        {
+            var filter = Builders<Transaction>.Filter.Eq(t => t.Id, id);
+            var update = Builders<Transaction>.Update.Set(t => t.Status, newStatus);
+
+            var result = await _transactionCollection.UpdateOneAsync(filter, update);
+
+            if (result.MatchedCount == 0) return NotFound(new { message = "Không tìm thấy giao dịch" });
+            return Ok(new { message = "Cập nhật trạng thái thành công" });
         }
     }
 }

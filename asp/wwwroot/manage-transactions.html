@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Giao dịch - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #202124;
+            --bg: #f4f7f6;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+        }
+
+        header {
+            background: white;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .add-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--success);
+            margin-bottom: 30px;
+        }
+
+            .add-box h3 {
+                margin-top: 0;
+                color: var(--dark);
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+            }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+            .form-row select, .form-row input {
+                flex: 1;
+                padding: 12px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                outline: none;
+                min-width: 200px;
+                font-size: 15px;
+            }
+
+                .form-row select:focus, .form-row input:focus {
+                    border-color: var(--primary);
+                }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .btn-add:hover {
+                opacity: 0.9;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--dark);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+            .status.dang-xu-ly {
+                background: #fff3cd;
+                color: #856404;
+            }
+
+            .status.hoan-tat {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            .status.da-huy {
+                background: #f8d7da;
+                color: #721c24;
+            }
+
+        .action-btn {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-handshake"></i> QUẢN LÝ GIAO DỊCH</a>
+        <nav style="display:flex; gap: 20px;">
+            <a href="manage-clients.html" style="color: var(--dark); text-decoration: none; font-weight: bold;"><i class="fas fa-users"></i> Khách hàng & Lịch</a>
+            <a href="index.html" style="color: var(--dark); text-decoration: none; font-weight: bold;"><i class="fas fa-home"></i> Về trang chủ</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <div class="add-box">
+            <h3><i class="fas fa-file-signature"></i> Tạo Giao Dịch Mới (Chốt Sale)</h3>
+            <div class="form-row">
+                <select id="selectCusId"><option value="">-- Đang tải danh sách Khách hàng --</option></select>
+                <select id="selectPropId"><option value="">-- Đang tải danh sách Bất động sản --</option></select>
+            </div>
+            <div class="form-row">
+                <select id="transType">
+                    <option value="Mua bán">Loại HĐ: Mua bán</option>
+                    <option value="Cho thuê">Loại HĐ: Cho thuê</option>
+                </select>
+                <input type="number" id="transPrice" placeholder="Nhập giá chốt cuối cùng (VNĐ)...">
+                <button class="btn-add" onclick="createTransaction()"><i class="fas fa-check-circle"></i> TẠO GIAO DỊCH</button>
+            </div>
+            <p id="msgTrans" style="margin:0; font-weight:bold; font-size:14px;"></p>
+        </div>
+
+        <h3 style="color: var(--dark);"><i class="fas fa-list"></i> Lịch sử Giao dịch</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã GD</th>
+                    <th>Khách hàng</th>
+                    <th>Bất động sản</th>
+                    <th>Loại & Giá chốt</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="transaction-list">
+                <tr><td colspan="6" style="text-align: center;">Đang tải dữ liệu...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let customersList = [];
+        let propertiesList = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const role = localStorage.getItem("role");
+            if (role !== "Admin" && role !== "Sales") {
+                alert("⛔ Bạn không có quyền truy cập trang này!");
+                window.location.href = "index.html";
+                return;
+            }
+            loadAllData();
+        });
+
+        // 1. TẢI DỮ LIỆU ĐỔ VÀO MENU THẢ XUỐNG
+        async function loadAllData() {
+            try {
+                const [resCus, resProp] = await Promise.all([
+                    fetch('/api/Customer'),
+                    fetch('/api/BatDongSan')
+                ]);
+
+                customersList = await resCus.json();
+                propertiesList = await resProp.json();
+
+                let cusHtml = '<option value="">-- Chọn Khách hàng chốt đơn --</option>';
+                customersList.forEach(c => cusHtml += `<option value="${c.id}">${c.name} - ${c.phone}</option>`);
+                document.getElementById('selectCusId').innerHTML = cusHtml;
+
+                let propHtml = '<option value="">-- Chọn Bất động sản --</option>';
+                propertiesList.forEach(p => propHtml += `<option value="${p.id}">${p.tieuDe}</option>`);
+                document.getElementById('selectPropId').innerHTML = propHtml;
+
+                loadTransactions();
+            } catch(err) {
+                console.error("Lỗi", err);
+            }
+        }
+
+        // 2. TẠO GIAO DỊCH MỚI
+        async function createTransaction() {
+            const msg = document.getElementById('msgTrans');
+            const data = {
+                customerId: document.getElementById('selectCusId').value,
+                propertyId: document.getElementById('selectPropId').value,
+                type: document.getElementById('transType').value,
+                price: parseFloat(document.getElementById('transPrice').value) || 0,
+                userId: localStorage.getItem("username"),
+                status: "Đang xử lý"
+            };
+
+            if (!data.customerId || !data.propertyId || data.price <= 0) {
+                msg.style.color = "red"; msg.innerText = "Vui lòng chọn đủ thông tin và nhập giá chốt hợp lệ!"; return;
+            }
+
+            msg.style.color = "blue"; msg.innerText = "Đang xử lý...";
+
+            try {
+                const res = await fetch('/api/Transaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    msg.style.color = "green"; msg.innerText = "✅ Tạo Giao dịch thành công!";
+                    document.getElementById('transPrice').value = "";
+                    loadTransactions();
+                    setTimeout(() => msg.innerText = "", 3000);
+                } else {
+                    msg.style.color = "red"; msg.innerText = "Có lỗi xảy ra khi tạo giao dịch!";
+                }
+            } catch (err) {
+                msg.style.color = "red"; msg.innerText = "Lỗi kết nối server!";
+            }
+        }
+
+        // 3. HIỂN THỊ DANH SÁCH GIAO DỊCH
+        function loadTransactions() {
+            fetch('/api/Transaction')
+                .then(res => res.json())
+                .then(data => {
+                    let html = '';
+                    if (data.length === 0) {
+                        html = '<tr><td colspan="6" style="text-align: center;">Chưa có giao dịch nào.</td></tr>';
+                    } else {
+                        data.forEach(t => {
+                            // Map ID sang tên Khách & tên BĐS
+                            const cus = customersList.find(c => c.id === t.customerId) || { name: `<strong>${t.customerId}</strong>` };
+                            const prop = propertiesList.find(p => p.id === t.propertyId) || { tieuDe: 'BĐS đã xóa/ẩn' };
+
+                            let statusClass = "dang-xu-ly";
+                            if (t.status === "Hoàn tất") statusClass = "hoan-tat";
+                            if (t.status === "Đã hủy") statusClass = "da-huy";
+
+                            html += `
+                                <tr>
+                                    <td style="color:#666; font-size:12px; font-weight:bold;">#${t.id ? t.id.slice(-5).toUpperCase() : 'NEW'}</td>
+                                    <td>${cus.name}</td>
+                                    <td style="font-weight:bold; color:var(--primary);">${prop.tieuDe}</td>
+                                    <td>
+                                        <span style="color:#666;">${t.type}</span><br>
+                                        <strong style="color:var(--accent); font-size:16px;">${t.price.toLocaleString('vi-VN')} đ</strong>
+                                    </td>
+                                    <td><span class="status ${statusClass}">${t.status}</span></td>
+                                    <td>
+                                        ${t.status === 'Đang xử lý' ? `
+                                            <button class="action-btn" style="background:#28a745; color:white;" onclick="updateStatus('${t.id}', 'Hoàn tất')"><i class="fas fa-check"></i> Hoàn tất</button>
+                                            <button class="action-btn" style="background:#dc3545; color:white;" onclick="updateStatus('${t.id}', 'Đã hủy')"><i class="fas fa-times"></i> Hủy</button>
+                                        ` : `
+                                            <button class="action-btn" style="background:#1a73e8; color:white;" onclick="alert('Chức năng in và tải Hợp đồng PDF đang được cập nhật!')"><i class="fas fa-file-pdf"></i> Hợp đồng</button>
+                                        `}
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    document.getElementById('transaction-list').innerHTML = html;
+                });
+        }
+
+        // 4. CẬP NHẬT TRẠNG THÁI GIAO DỊCH
+        async function updateStatus(id, newStatus) {
+            if(!confirm(`Chuyển trạng thái giao dịch thành: ${newStatus}?`)) return;
+            try {
+                await fetch(`/api/Transaction/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newStatus)
+                });
+                loadTransactions();
+            } catch (err) {
+                alert("Lỗi kết nối, không thể cập nhật!");
+            }
+        }
+    </script>
+</body>
+</html>

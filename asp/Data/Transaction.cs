@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace asp.Data
 {
@@ -9,20 +10,24 @@ namespace asp.Data
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
+        [BsonRepresentation(BsonType.ObjectId)]
         [BsonElement("PropertyId")]
-        public string PropertyId { get; set; }
+        public string PropertyId { get; set; } = null!;
 
         [BsonElement("CustomerId")]
-        public string CustomerId { get; set; }
+        public string CustomerId { get; set; } = null!;
+
+        [BsonElement("UserId")]
+        public string? UserId { get; set; }
 
         [BsonElement("Type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = "Mua bán";
 
         [BsonElement("Price")]
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         [BsonElement("Status")]
-        public string Status { get; set; }
+        public string Status { get; set; } = "Đang xử lý";
 
         [BsonElement("Date")]
         public DateTime Date { get; set; } = DateTime.Now;
