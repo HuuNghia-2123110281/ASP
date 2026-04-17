@@ -14,12 +14,11 @@ namespace asp.Controllers
     public class BatDongSanController : ControllerBase
     {
         private readonly IMongoCollection<BatDongSan> _bdsCollection;
-        private readonly IWebHostEnvironment _env;
 
-        public BatDongSanController(IMongoDatabase database, IWebHostEnvironment env)
+        // Đã gỡ bỏ IWebHostEnvironment vì không cần lưu file vào ổ cứng nữa
+        public BatDongSanController(IMongoDatabase database)
         {
             _bdsCollection = database.GetCollection<BatDongSan>("BatDongSans");
-            _env = env;
         }
 
         // 1. Lấy danh sách + Phân trang
@@ -44,7 +43,7 @@ namespace asp.Controllers
             return Ok(batDongSan);
         }
 
-        // 3. Thêm mới BĐS
+        // 3. THÊM MỚI BĐS - LƯU ẢNH VÀO DATABASE BẰNG BASE64
         [HttpPost]
         public async Task<ActionResult<BatDongSan>> PostBatDongSan([FromForm] BatDongSanRequest request)
         {
@@ -57,21 +56,16 @@ namespace asp.Controllers
             {
                 if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images");
-                    if (!Directory.Exists(uploadsFolder))
+                    // Đọc file ảnh, mã hóa thành Base64 để lưu vĩnh viễn vào MongoDB
+                    using (var memoryStream = new MemoryStream())
                     {
-                        Directory.CreateDirectory(uploadsFolder);
+                        await request.HinhAnhFile.CopyToAsync(memoryStream);
+                        byte[] imageBytes = memoryStream.ToArray();
+                        string base64String = Convert.ToBase64String(imageBytes);
+
+                        // Ghép chuỗi chuẩn để thẻ <img src="..."> trên HTML đọc được
+                        hinhAnhUrl = $"data:{request.HinhAnhFile.ContentType};base64,{base64String}";
                     }
-
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + request.HinhAnhFile.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await request.HinhAnhFile.CopyToAsync(fileStream);
-                    }
-
-                    hinhAnhUrl = "/images/" + uniqueFileName;
                 }
 
                 var batDongSan = new BatDongSan
@@ -95,7 +89,7 @@ namespace asp.Controllers
             }
         }
 
-        // 4. Sửa BĐS
+        // 4. SỬA BĐS - CẬP NHẬT ẢNH BASE64
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBatDongSan(string id, [FromForm] BatDongSanRequest request)
         {
@@ -106,15 +100,14 @@ namespace asp.Controllers
 
             if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
             {
-                string uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images");
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + request.HinhAnhFile.FileName;
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                // Mã hóa ảnh mới thành Base64
+                using (var memoryStream = new MemoryStream())
                 {
-                    await request.HinhAnhFile.CopyToAsync(fileStream);
+                    await request.HinhAnhFile.CopyToAsync(memoryStream);
+                    byte[] imageBytes = memoryStream.ToArray();
+                    string base64String = Convert.ToBase64String(imageBytes);
+                    hinhAnhUrl = $"data:{request.HinhAnhFile.ContentType};base64,{base64String}";
                 }
-                hinhAnhUrl = "/images/" + uniqueFileName;
             }
 
             existingBds.TieuDe = request.TieuDe;
@@ -139,15 +132,13 @@ namespace asp.Controllers
             return NoContent();
         }
 
-        // 6. TÌM KIẾM BĐS
+        // 6. TÌM KIẾM CƠ BẢN
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<BatDongSan>>> SearchBatDongSan([FromQuery] string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
             {
-                var allList = await _bdsCollection.Find(_ => true)
-                    .SortByDescending(x => x.Id)
-                    .ToListAsync();
+                var allList = await _bdsCollection.Find(_ => true).SortByDescending(x => x.Id).ToListAsync();
                 return Ok(allList);
             }
             var filter = Builders<BatDongSan>.Filter.Or(
@@ -155,14 +146,11 @@ namespace asp.Controllers
                 Builders<BatDongSan>.Filter.Regex(x => x.DiaChi, new MongoDB.Bson.BsonRegularExpression(keyword, "i")),
                 Builders<BatDongSan>.Filter.Regex(x => x.LoaiHinh, new MongoDB.Bson.BsonRegularExpression(keyword, "i"))
             );
-
-            var list = await _bdsCollection.Find(filter)
-                .SortByDescending(x => x.Id)
-                .ToListAsync();
-
+            var list = await _bdsCollection.Find(filter).SortByDescending(x => x.Id).ToListAsync();
             return Ok(list);
         }
-        // 7. TÌM KIẾM NÂNG CAO
+
+        // 7. TÌM KIẾM NÂNG CAO (LỌC THEO TIÊU CHÍ)
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<BatDongSan>>> FilterBatDongSan(
             [FromQuery] string? keyword,
@@ -172,7 +160,6 @@ namespace asp.Controllers
         {
             var builder = Builders<BatDongSan>.Filter;
             var filter = builder.Empty;
-
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -194,7 +181,7 @@ namespace asp.Controllers
             }
             if (maxGia.HasValue)
             {
-                filter &= builder.Lte(x => x.Gia, maxGia.Value); 
+                filter &= builder.Lte(x => x.Gia, maxGia.Value);
             }
 
             var list = await _bdsCollection.Find(filter)
