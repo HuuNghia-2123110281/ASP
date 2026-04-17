@@ -23,6 +23,6 @@ namespace asp.Data
         public DateTime AppointmentDate { get; set; }
 
         [BsonElement("Status")]
-        public string Status { get; set; } = "Chờ xác nhận"; // Cập nhật logic thực tế
+        public string Status { get; set; } = "Chờ xác nhận";
     }
 }

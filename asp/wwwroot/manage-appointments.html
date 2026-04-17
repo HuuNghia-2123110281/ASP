@@ -43,7 +43,6 @@
             padding: 0 20px;
         }
 
-        /* Form thêm lịch hẹn */
         .add-box {
             background: white;
             padding: 25px;
@@ -80,11 +79,6 @@
             transition: 0.3s;
         }
 
-            .btn-add:hover {
-                background: #1557b0;
-            }
-
-        /* Bảng dữ liệu */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -109,7 +103,6 @@
             background-color: #f8f9fa;
         }
 
-        /* Status Tags */
         .status {
             padding: 5px 10px;
             border-radius: 20px;
@@ -132,7 +125,6 @@
                 color: #721c24;
             }
 
-        /* Nút hành động */
         .action-btn {
             border: none;
             padding: 6px 12px;
@@ -165,13 +157,15 @@
         <div class="add-box">
             <h3 style="margin-top:0;"><i class="fas fa-plus-circle"></i> Tạo lịch hẹn mới</h3>
             <div class="form-row">
-                <input type="text" id="cusName" placeholder="Tên khách hàng (*)">
-                <input type="text" id="cusPhone" placeholder="Số điện thoại (*)">
-                <input type="text" id="propTitle" placeholder="Dự án / Căn nhà quan tâm (*)">
+                <select id="cusId">
+                    <option value="">-- Đang tải danh sách khách hàng... --</option>
+                </select>
+                <select id="propId">
+                    <option value="">-- Đang tải danh sách dự án... --</option>
+                </select>
             </div>
             <div class="form-row">
                 <input type="datetime-local" id="appDate" title="Ngày giờ xem nhà">
-                <input type="text" id="notes" placeholder="Ghi chú thêm (VD: Khách đi xem cùng vợ)">
                 <button class="btn-add" onclick="createAppointment()"><i class="fas fa-save"></i> TẠO LỊCH HẸN</button>
             </div>
             <p id="msg" style="margin:0; font-weight:bold;"></p>
@@ -195,16 +189,45 @@
     </div>
 
     <script>
+        let customersList = [];
+        let propertiesList = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             const role = localStorage.getItem("role");
             if (role !== "Admin" && role !== "Sales") {
                 alert("⛔ Bạn không có quyền truy cập!");
                 window.location.href = "index.html";
+                return;
             }
-            loadAppointments();
+            loadAllData();
         });
 
-        // TẢI DANH SÁCH LỊCH HẸN
+        // TẢI DATA VÀO MENU THẢ XUỐNG
+        async function loadAllData() {
+            try {
+                const [resCus, resProp] = await Promise.all([
+                    fetch('/api/Customer'),
+                    fetch('/api/BatDongSan')
+                ]);
+
+                customersList = await resCus.json();
+                propertiesList = await resProp.json();
+
+                let cusHtml = '<option value="">-- Chọn khách hàng --</option>';
+                customersList.forEach(c => cusHtml += `<option value="${c.id}">${c.name} - ${c.phone}</option>`);
+                document.getElementById('cusId').innerHTML = cusHtml;
+
+                let propHtml = '<option value="">-- Chọn Dự án / Căn nhà --</option>';
+                propertiesList.forEach(p => propHtml += `<option value="${p.id}">${p.tieuDe}</option>`);
+                document.getElementById('propId').innerHTML = propHtml;
+
+                loadAppointments();
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu", err);
+            }
+        }
+
+        // TẢI BẢNG LỊCH HẸN
         function loadAppointments() {
             fetch('/api/Appointment')
                 .then(res => res.json())
@@ -214,51 +237,52 @@
                         html = '<tr><td colspan="5" style="text-align: center;">Chưa có lịch hẹn nào.</td></tr>';
                     } else {
                         data.forEach(a => {
-                            // Định dạng màu sắc trạng thái
-                            let statusClass = "cho-xac-nhan";
-                            if (a.status === "Đã xem nhà") statusClass = "da-xem";
-                            if (a.status === "Đã hủy") statusClass = "da-huy";
+                            // Map ID sang Tên. Nếu không tìm thấy, chứng tỏ là Username do khách tự đặt trên web
+                            const cus = customersList.find(c => c.id === a.customerId) || { name: `<strong>${a.customerId}</strong>`, phone: '<span style="color:var(--success)">Khách tự đặt trên Web</span>' };
+                            const prop = propertiesList.find(p => p.id === a.propertyId) || { tieuDe: 'Không rõ' };
 
-                            // Xử lý hiển thị ngày giờ chuẩn Việt Nam
+                            let statusClass = "cho-xac-nhan";
+                            if (a.status === "Đã xem" || a.status === "Đã xem nhà") statusClass = "da-xem";
+                            if (a.status === "Hủy" || a.status === "Đã hủy") statusClass = "da-huy";
+
                             const dateObj = new Date(a.appointmentDate);
                             const formattedDate = dateObj.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
 
                             html += `
-                                <tr>
-                                    <td>
-                                        <strong>${a.customerName}</strong><br>
-                                        <small><i class="fas fa-phone"></i> ${a.customerPhone}</small>
-                                    </td>
-                                    <td style="color: var(--primary); font-weight: bold;">${a.propertyTitle}</td>
-                                    <td><i class="far fa-clock"></i> ${formattedDate}</td>
-                                    <td><span class="status ${statusClass}">${a.status}</span></td>
-                                    <td>
-                                        ${a.status === 'Chờ xác nhận' ? `
-                                            <button class="action-btn btn-success" onclick="updateStatus('${a.id}', 'Đã xem nhà')"><i class="fas fa-check"></i> Chốt</button>
-                                            <button class="action-btn btn-danger" onclick="updateStatus('${a.id}', 'Đã hủy')"><i class="fas fa-times"></i> Hủy</button>
-                                        ` : '<span style="color:#666; font-size:12px;">Đã đóng</span>'}
-                                    </td>
-                                </tr>
-                            `;
+                                    <tr>
+                                        <td>
+                                            ${cus.name}<br>
+                                            <small><i class="fas fa-phone"></i> ${cus.phone}</small>
+                                        </td>
+                                        <td style="color: var(--primary); font-weight: bold;">${prop.tieuDe}</td>
+                                        <td><i class="far fa-clock"></i> ${formattedDate}</td>
+                                        <td><span class="status ${statusClass}">${a.status}</span></td>
+                                        <td>
+                                            ${a.status === 'Chờ xác nhận' ? `
+                                                <button class="action-btn btn-success" onclick="updateStatus('${a.id}', 'Đã xem nhà')"><i class="fas fa-check"></i> Chốt</button>
+                                                <button class="action-btn btn-danger" onclick="updateStatus('${a.id}', 'Đã hủy')"><i class="fas fa-times"></i> Hủy</button>
+                                            ` : '<span style="color:#666; font-size:12px;">Đã đóng</span>'}
+                                        </td>
+                                    </tr>
+                                `;
                         });
                     }
                     document.getElementById('appointment-list').innerHTML = html;
                 });
         }
 
-        // TẠO LỊCH MỚI
+        // TẠO LỊCH HẸN BỞI SALES
         async function createAppointment() {
             const msg = document.getElementById('msg');
             const data = {
-                customerName: document.getElementById('cusName').value.trim(),
-                customerPhone: document.getElementById('cusPhone').value.trim(),
-                propertyTitle: document.getElementById('propTitle').value.trim(),
+                customerId: document.getElementById('cusId').value,
+                propertyId: document.getElementById('propId').value,
                 appointmentDate: document.getElementById('appDate').value,
-                notes: document.getElementById('notes').value.trim()
+                userId: localStorage.getItem("username") // Gắn ID của Sales đang đăng nhập
             };
 
-            if (!data.customerName || !data.propertyTitle || !data.appointmentDate) {
-                msg.style.color = "red"; msg.innerText = "Vui lòng nhập đủ tên, dự án và ngày giờ!"; return;
+            if (!data.customerId || !data.propertyId || !data.appointmentDate) {
+                msg.style.color = "red"; msg.innerText = "Vui lòng chọn khách hàng, dự án và ngày giờ!"; return;
             }
 
             msg.style.color = "blue"; msg.innerText = "Đang lưu...";
@@ -272,24 +296,23 @@
                 if (res.ok) {
                     msg.style.color = "green"; msg.innerText = "✅ Tạo lịch thành công!";
                     setTimeout(() => msg.innerText = "", 3000);
-                    loadAppointments(); // Tải lại bảng
+                    loadAppointments();
                 }
             } catch (err) {
                 msg.style.color = "red"; msg.innerText = "Lỗi kết nối!";
             }
         }
 
-        // CẬP NHẬT TRẠNG THÁI (ĐÃ XEM / HỦY)
+        // ĐỔI TRẠNG THÁI
         async function updateStatus(id, newStatus) {
-            if(!confirm(`Xác nhận chuyển trạng thái thành: ${newStatus}?`)) return;
-
+            if (!confirm(`Xác nhận chuyển trạng thái thành: ${newStatus}?`)) return;
             try {
                 await fetch(`/api/Appointment/${id}/status`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newStatus)
                 });
-                loadAppointments(); // Tải lại bảng để cập nhật màu sắc
+                loadAppointments();
             } catch (err) {
                 alert("Lỗi khi cập nhật trạng thái!");
             }
