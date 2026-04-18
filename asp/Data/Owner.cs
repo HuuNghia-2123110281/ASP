@@ -9,13 +9,9 @@ namespace asp.Data
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonElement("FullName")]
         public string FullName { get; set; } = null!;
-
         public string Phone { get; set; } = null!;
-
-        public string IDCard { get; set; } = null!;
-
+        public string? IDCard { get; set; }
         public string? Address { get; set; }
     }
 }
