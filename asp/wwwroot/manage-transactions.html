@@ -300,17 +300,36 @@
 
         async function loadAllData() {
             try {
-                const [resCus, resProp] = await Promise.all([
+                const [resCus, resProp, resApp] = await Promise.all([
                     fetch('/api/Customer'),
-                    fetch('/api/BatDongSan')
+                    fetch('/api/BatDongSan'),
+                    fetch('/api/Appointment')
                 ]);
 
                 customersList = await resCus.json();
                 propertiesList = await resProp.json();
+                const appointmentsList = await resApp.json();
+
+                const viewedAppointments = appointmentsList.filter(a => a.status === "Đã xem nhà" || a.status === "Đã xem");
+
+                const viewedCustomerIds = [...new Set(viewedAppointments.map(a => a.customerId))];
 
                 let cusHtml = '<option value="">-- Chọn Khách hàng chốt đơn --</option>';
-                customersList.forEach(c => cusHtml += `<option value="${c.id}">${c.name} - ${c.phone}</option>`);
-                cusHtml += `<option value="Khách Web tự đặt">Khách Web tự đặt</option>`;
+
+                if (viewedCustomerIds.length === 0) {
+                    cusHtml = '<option value="">-- Chưa có khách nào hoàn tất xem nhà --</option>';
+                } else {
+                    viewedCustomerIds.forEach(customerId => {
+                        const crmCustomer = customersList.find(c => c.id === customerId);
+                        if (crmCustomer) {
+                            cusHtml += `<option value="${crmCustomer.id}">Khách CRM: ${crmCustomer.name} - ${crmCustomer.phone}</option>`;
+                        } else {
+
+                            cusHtml += `<option value="${customerId}">Khách Web tự đặt: ${customerId}</option>`;
+                        }
+                    });
+                }
+
                 document.getElementById('selectCusId').innerHTML = cusHtml;
 
                 let propHtml = '<option value="">-- Chọn Bất động sản --</option>';
@@ -319,7 +338,7 @@
 
                 loadTransactions();
             } catch (err) {
-                console.error("Lỗi", err);
+                console.error("Lỗi tải dữ liệu", err);
             }
         }
 
