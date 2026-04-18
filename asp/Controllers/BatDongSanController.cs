@@ -91,7 +91,7 @@ namespace asp.Controllers
             }
         }
 
-        // 4. SỬA BĐS - CẬP NHẬT ẢNH BASE64
+        // 4. SỬA BĐS
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBatDongSan(string id, [FromForm] BatDongSanRequest request)
         {
@@ -118,11 +118,8 @@ namespace asp.Controllers
             existingBds.MoTa = request.MoTa;
             existingBds.DienTich = request.DienTich;
             existingBds.PhongNgu = request.PhongNgu;
-
-            // --- MỚI THÊM: Cập nhật dữ liệu Dự án và Chủ nhà ---
             existingBds.ProjectId = request.ProjectId;
             existingBds.OwnerId = request.OwnerId;
-
             existingBds.HinhAnhUrl = hinhAnhUrl;
 
             await _bdsCollection.ReplaceOneAsync(x => x.Id == id, existingBds);
