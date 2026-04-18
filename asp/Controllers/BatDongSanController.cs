@@ -15,7 +15,6 @@ namespace asp.Controllers
     {
         private readonly IMongoCollection<BatDongSan> _bdsCollection;
 
-        // Đã gỡ bỏ IWebHostEnvironment vì không cần lưu file vào ổ cứng nữa
         public BatDongSanController(IMongoDatabase database)
         {
             _bdsCollection = database.GetCollection<BatDongSan>("BatDongSans");
@@ -56,14 +55,12 @@ namespace asp.Controllers
             {
                 if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
                 {
-                    // Đọc file ảnh, mã hóa thành Base64 để lưu vĩnh viễn vào MongoDB
                     using (var memoryStream = new MemoryStream())
                     {
                         await request.HinhAnhFile.CopyToAsync(memoryStream);
                         byte[] imageBytes = memoryStream.ToArray();
                         string base64String = Convert.ToBase64String(imageBytes);
 
-                        // Ghép chuỗi chuẩn để thẻ <img src="..."> trên HTML đọc được
                         hinhAnhUrl = $"data:{request.HinhAnhFile.ContentType};base64,{base64String}";
                     }
                 }
@@ -77,6 +74,11 @@ namespace asp.Controllers
                     Gia = request.Gia,
                     DiaChi = request.DiaChi,
                     MoTa = request.MoTa,
+
+                    // --- MỚI THÊM: Hứng dữ liệu Dự án và Chủ nhà ---
+                    ProjectId = request.ProjectId,
+                    OwnerId = request.OwnerId,
+
                     HinhAnhUrl = hinhAnhUrl ?? "https://loremflickr.com/400/300/house"
                 };
 
@@ -100,7 +102,6 @@ namespace asp.Controllers
 
             if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
             {
-                // Mã hóa ảnh mới thành Base64
                 using (var memoryStream = new MemoryStream())
                 {
                     await request.HinhAnhFile.CopyToAsync(memoryStream);
@@ -117,6 +118,11 @@ namespace asp.Controllers
             existingBds.MoTa = request.MoTa;
             existingBds.DienTich = request.DienTich;
             existingBds.PhongNgu = request.PhongNgu;
+
+            // --- MỚI THÊM: Cập nhật dữ liệu Dự án và Chủ nhà ---
+            existingBds.ProjectId = request.ProjectId;
+            existingBds.OwnerId = request.OwnerId;
+
             existingBds.HinhAnhUrl = hinhAnhUrl;
 
             await _bdsCollection.ReplaceOneAsync(x => x.Id == id, existingBds);

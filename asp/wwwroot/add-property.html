@@ -18,7 +18,6 @@
             margin: 0;
         }
 
-        /* HEADER */
         header {
             background: white;
             padding: 20px 5%;
@@ -36,7 +35,6 @@
             text-transform: uppercase;
         }
 
-        /* FORM CONTAINER */
         .form-container {
             max-width: 800px;
             margin: 40px auto;
@@ -79,6 +77,12 @@
                     box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
                 }
 
+        /* Đánh dấu các ô lấy dữ liệu tự động */
+        .dynamic-select {
+            border-left: 4px solid #ffc107 !important;
+            background-color: #fafafa;
+        }
+
         .row {
             display: flex;
             gap: 20px;
@@ -117,9 +121,10 @@
 
     <header>
         <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA - SALES PANEL</a>
-        <a href="index.html" style="color: var(--dark); text-decoration: none; font-weight: bold;">
-            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
-        </a>
+        <div style="display: flex; gap: 20px;">
+            <a href="manage-system.html" id="linkConfig" style="display:none; color: var(--dark); text-decoration: none; font-weight: bold;"><i class="fas fa-cogs"></i> Cấu hình</a>
+            <a href="index.html" style="color: var(--dark); text-decoration: none; font-weight: bold;"><i class="fas fa-arrow-left"></i> Quay lại trang chủ</a>
+        </div>
     </header>
 
     <div class="form-container">
@@ -132,17 +137,29 @@
 
         <div class="row">
             <div class="col form-group">
-                <label>Loại hình <span style="color:red">*</span></label>
-                <select id="loaiHinh">
-                    <option value="Căn hộ">Căn hộ chung cư</option>
-                    <option value="Nhà phố">Nhà phố / Liền kề</option>
-                    <option value="Biệt thự">Biệt thự</option>
-                    <option value="Đất nền">Đất nền dự án</option>
+                <label>Loại hình BĐS <span style="color:red">*</span></label>
+                <select id="loaiHinh" class="dynamic-select">
+                    <option value="">-- Đang tải danh mục... --</option>
                 </select>
             </div>
             <div class="col form-group">
                 <label>Mức giá (VNĐ) <span style="color:red">*</span></label>
                 <input type="number" id="gia" placeholder="VD: 4500000000">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label>Thuộc Dự án</label>
+                <select id="duAn" class="dynamic-select">
+                    <option value="">-- Không thuộc dự án nào (Nhà lẻ) --</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label>Nguồn hàng (Chủ nhà ký gửi) <span style="color:red">*</span></label>
+                <select id="chuNha" class="dynamic-select">
+                    <option value="">-- Đang tải danh sách... --</option>
+                </select>
             </div>
         </div>
 
@@ -170,7 +187,7 @@
         <div class="form-group">
             <label>Hình ảnh thực tế <span style="color:red">*</span></label>
             <input type="file" id="hinhAnh" accept="image/png, image/jpeg, image/jpg" required>
-            <small style="color: #666;">Thêm hình ảnh thực tế dự án</small>
+            <small style="color: #666;">Thêm hình ảnh thực tế (Sẽ được xử lý bởi backend C#)</small>
         </div>
 
         <button class="submit-btn" onclick="submitProperty()"><i class="fas fa-upload"></i> XUẤT BẢN TIN LÊN WEB</button>
@@ -181,14 +198,49 @@
         // 1. KIỂM TRA PHÂN QUYỀN (BẢO VỆ TRANG)
         document.addEventListener("DOMContentLoaded", () => {
             const role = localStorage.getItem("role");
-            // Nếu không phải Admin và không phải Sales thì đuổi về trang chủ
             if (role !== "Admin" && role !== "Sales") {
                 alert("⛔ Cảnh báo: Bạn không có quyền truy cập trang Quản lý Đăng tin!");
                 window.location.href = "index.html";
+                return;
             }
+
+            if (role === "Admin") {
+                document.getElementById("linkConfig").style.display = "inline-block";
+            }
+
+            // Gọi API load dữ liệu các ô Menu thả xuống
+            loadMasterData();
         });
 
-        // 2. XỬ LÝ GỬI DỮ LIỆU LÊN API
+        // 2. HÚT DỮ LIỆU TỪ DB ĐỔ VÀO DROPDOWN
+        async function loadMasterData() {
+            try {
+                // Fetch Danh mục
+                fetch('/api/Category').then(res => res.json()).then(data => {
+                    let html = '<option value="">-- Chọn Loại hình BĐS --</option>';
+                    data.forEach(c => html += `<option value="${c.name}">${c.name}</option>`);
+                    document.getElementById('loaiHinh').innerHTML = html;
+                });
+
+                // Fetch Dự án
+                fetch('/api/Project').then(res => res.json()).then(data => {
+                    let html = '<option value="">-- Không thuộc dự án nào (Nhà lẻ) --</option>';
+                    data.forEach(p => html += `<option value="${p.id}">${p.name} - ${p.investor}</option>`);
+                    document.getElementById('duAn').innerHTML = html;
+                });
+
+                // Fetch Chủ nhà
+                fetch('/api/Owner').then(res => res.json()).then(data => {
+                    let html = '<option value="">-- Chọn Chủ nhà (Bắt buộc) --</option>';
+                    data.forEach(o => html += `<option value="${o.id}">${o.fullName} (${o.phone})</option>`);
+                    document.getElementById('chuNha').innerHTML = html;
+                });
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu nền:", err);
+            }
+        }
+
+        // 3. XỬ LÝ GỬI DỮ LIỆU LÊN API
         async function submitProperty() {
             const btn = document.querySelector('.submit-btn');
             const msg = document.getElementById('message');
@@ -201,35 +253,39 @@
             const phongNgu = document.getElementById('phongNgu').value;
             const diaChi = document.getElementById('diaChi').value.trim();
             const moTa = document.getElementById('moTa').value.trim();
+            const duAnId = document.getElementById('duAn').value;
+            const chuNhaId = document.getElementById('chuNha').value;
             const fileInput = document.getElementById('hinhAnh');
 
-            // Validate dữ liệu bắt buộc
-            if (!tieuDe || !gia || !diaChi || fileInput.files.length === 0) {
+            // Validate dữ liệu bắt buộc (Gồm cả yêu cầu chọn Chủ nhà)
+            if (!tieuDe || !gia || !diaChi || !loaiHinh || fileInput.files.length === 0 || !chuNhaId) {
                 msg.style.color = "red";
-                msg.innerText = "Vui lòng nhập đầy đủ thông tin và chọn hình ảnh!";
+                msg.innerText = "Vui lòng nhập đủ thông tin, chọn Chủ nhà và đính kèm hình ảnh!";
                 return;
             }
 
-            // Khởi tạo FormData
+            // Khởi tạo FormData theo đúng logic của bạn
             const formData = new FormData();
 
             // Nhét dữ liệu vào FormData
             formData.append("TieuDe", tieuDe);
             formData.append("LoaiHinh", loaiHinh);
             formData.append("Gia", gia);
-            formData.append("DienTich", dienTich || 0); // Nếu trống thì gửi số 0
-            formData.append("PhongNgu", phongNgu || 0); // Nếu trống thì gửi số 0
+            formData.append("DienTich", dienTich || 0);
+            formData.append("PhongNgu", phongNgu || 0);
             formData.append("DiaChi", diaChi);
             formData.append("MoTa", moTa);
-            formData.append("HinhAnhFile", fileInput.files[0]); // Đính kèm file hình
+            formData.append("ProjectId", duAnId);
+            formData.append("OwnerId", chuNhaId);
+            formData.append("HinhAnhFile", fileInput.files[0]);
 
-            // Đổi trạng thái nút bấm
+
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải ảnh lên...';
             btn.style.background = "#6c757d";
             btn.disabled = true;
 
             try {
-                // Gửi FormData lên C# (Không dùng Content-Type header)
+
                 const response = await fetch('/api/BatDongSan', {
                     method: 'POST',
                     body: formData
@@ -238,7 +294,6 @@
                 if (response.ok) {
                     msg.style.color = "green";
                     msg.innerText = "🎉 Đăng tin & tải ảnh thành công!";
-                    // Đợi 2 giây rồi về trang chủ xem thành quả
                     setTimeout(() => { window.location.href = "index.html"; }, 2000);
                 } else {
                     const result = await response.json();

@@ -6,6 +6,8 @@ namespace asp.Data
     {
         public string TieuDe { get; set; } = null!;
         public string LoaiHinh { get; set; } = null!;
+        public string? ProjectId { get; set; }
+        public string? OwnerId { get; set; }
         public double DienTich { get; set; }
         public int PhongNgu { get; set; }
         public double Gia { get; set; }
