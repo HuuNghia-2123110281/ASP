@@ -23,12 +23,12 @@ namespace asp.Controllers
             return Ok(await _customerCollection.Find(_ => true).SortByDescending(x => x.Id).ToListAsync());
         }
 
-        //Xem chi tiết 1 khách hàng
+        // Xem chi tiết 1 khách hàng
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetById(string id)
         {
             var customer = await _customerCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
-            if (customer == null) return NotFound();
+            if (customer == null) return NotFound(new { message = "Không tìm thấy khách hàng!" });
             return Ok(customer);
         }
 
@@ -42,12 +42,12 @@ namespace asp.Controllers
             return Ok(customer);
         }
 
-        //Cập nhật thông tin khách hàng
+        // Cập nhật thông tin khách hàng
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, Customer updatedCustomer)
         {
             var result = await _customerCollection.ReplaceOneAsync(c => c.Id == id, updatedCustomer);
-            if (result.MatchedCount == 0) return NotFound();
+            if (result.MatchedCount == 0) return NotFound(new { message = "Không tìm thấy khách hàng để cập nhật!" });
             return Ok(new { message = "Cập nhật thành công!" });
         }
     }

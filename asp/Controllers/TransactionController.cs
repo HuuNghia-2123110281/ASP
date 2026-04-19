@@ -27,6 +27,15 @@ namespace asp.Controllers
             return Ok(list);
         }
 
+        // --- MỚI BỔ SUNG: Xem chi tiết 1 giao dịch ---
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Transaction>> GetTransactionById(string id)
+        {
+            var trans = await _transactionCollection.Find(t => t.Id == id).FirstOrDefaultAsync();
+            if (trans == null) return NotFound(new { message = "Không tìm thấy giao dịch!" });
+            return Ok(trans);
+        }
+
         // 2. Tạo giao dịch mới (Kèm Fix lỗi TC07)
         [HttpPost]
         public async Task<IActionResult> Post(Transaction transaction)

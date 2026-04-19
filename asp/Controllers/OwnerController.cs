@@ -29,7 +29,7 @@ namespace asp.Controllers
             return Ok(new { message = "Thêm chủ nhà thành công!", data = owner });
         }
 
-        //Lấy danh sách BĐS thuộc sở hữu của Chủ nhà này
+        // Lấy danh sách BĐS thuộc sở hữu của Chủ nhà này
         [HttpGet("{id}/properties")]
         public async Task<IActionResult> GetPropertiesByOwner(string id)
         {

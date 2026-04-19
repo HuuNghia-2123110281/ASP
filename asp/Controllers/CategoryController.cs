@@ -27,11 +27,12 @@ namespace asp.Controllers
             return Ok(new { message = "Thêm danh mục thành công!", data = category });
         }
 
-        //Sửa danh mục
+        // Sửa danh mục
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, Category updatedCat)
         {
-            await _categoryCollection.ReplaceOneAsync(c => c.Id == id, updatedCat);
+            var result = await _categoryCollection.ReplaceOneAsync(c => c.Id == id, updatedCat);
+            if (result.MatchedCount == 0) return NotFound(new { message = "Không tìm thấy danh mục!" });
             return Ok(new { message = "Cập nhật danh mục thành công!" });
         }
     }
