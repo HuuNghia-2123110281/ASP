@@ -313,21 +313,23 @@
         </a>
 
         <div class="nav-menu">
-            <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin-dashboard.html" class="nav-item active"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
 
             <div class="divider"></div>
-            <div class="nav-heading">Quản trị Nguồn hàng</div>
+
             <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
             <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
 
             <div class="divider"></div>
-            <div class="nav-heading">Nghiệp vụ Sales</div>
+
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
             <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
             <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Nhân viên sales</a>
-            <a href="manage-news.html" class="nav-item active"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
+
+            <a href="manage-employees.html" id="menu-employees" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
+
+            <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
 
@@ -388,28 +390,50 @@
         let employees = [], properties = [], allApps = [], allTrans = [];
 
         document.addEventListener("DOMContentLoaded", async () => {
-            document.getElementById("adminName").innerText = localStorage.getItem("username") || "Admin";
+            const role = localStorage.getItem("role");
+            const username = localStorage.getItem("username");
 
-            const [resU, resP, resA, resT] = await Promise.all([fetch('/api/User'), fetch('/api/BatDongSan'), fetch('/api/Appointment'), fetch('/api/Transaction')]);
-            const users = await resU.json();
-            properties = await resP.json();
-            allApps = await resA.json();
-            allTrans = await resT.json();
+            if (role !== "Admin") {
+                window.location.href = "index.html";
+                return;
+            }
 
-            // Lọc những User có Role là Sales
-            employees = users.filter(u => u.role === 'Sales');
+            document.getElementById("adminName").innerText = username || "Admin";
 
-            let html = '';
-            if (employees.length === 0) html = '<tr><td colspan="4" style="text-align:center;">Chưa có nhân viên Sales nào</td></tr>';
-            employees.forEach(e => {
-                html += `<tr>
-                        <td><strong style="color:var(--dark); font-size:16px;">${e.fullName || e.username}</strong></td>
-                        <td><span style="background:#eaecf4; padding:3px 8px; border-radius:4px;">${e.username}</span></td>
-                        <td>${e.phone || 'Chưa cập nhật'}<br><small style="color:#858796">${e.email || ''}</small></td>
-                        <td><button class="action-btn" onclick="viewDetail('${e.username}')"><i class="fas fa-folder-open"></i> Xem KPI & Công việc</button></td>
-                    </tr>`;
-            });
-            document.getElementById('employee-list').innerHTML = html;
+            try {
+                const [resU, resP, resA, resT] = await Promise.all([
+                    fetch('/api/User'),
+                    fetch('/api/BatDongSan'),
+                    fetch('/api/Appointment'),
+                    fetch('/api/Transaction')
+                ]);
+
+                const users = await resU.json();
+                properties = await resP.json();
+                allApps = await resA.json();
+                allTrans = await resT.json();
+
+                employees = users.filter(u => u.role === 'Sales');
+
+                let html = '';
+                if (employees.length === 0) {
+                    html = '<tr><td colspan="4" style="text-align:center;">Chưa có nhân viên Sales nào</td></tr>';
+                } else {
+                    employees.forEach(e => {
+                        html += `<tr>
+                            <td><strong style="color:var(--dark); font-size:16px;">${e.fullName || e.username}</strong></td>
+                            <td><span style="background:#eaecf4; padding:3px 8px; border-radius:4px;">${e.username}</span></td>
+                            <td>${e.phone || 'Chưa cập nhật'}<br><small style="color:#858796">${e.email || ''}</small></td>
+                            <td><button class="action-btn" onclick="viewDetail('${e.username}')"><i class="fas fa-folder-open"></i> Xem KPI & Công việc</button></td>
+                        </tr>`;
+                    });
+                }
+                document.getElementById('employee-list').innerHTML = html;
+
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                document.getElementById('employee-list').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi kết nối cơ sở dữ liệu!</td></tr>';
+            }
         });
 
         function viewDetail(username) {

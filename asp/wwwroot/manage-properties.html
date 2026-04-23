@@ -181,19 +181,23 @@
     <nav class="sidebar">
         <a href="admin-dashboard.html" class="sidebar-brand"><i class="fas fa-laugh-wink"></i> BĐS NGHĨA</a>
         <div class="nav-menu">
-            <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin-dashboard.html" class="nav-item active"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
+
             <div class="divider"></div>
-            <div class="nav-heading">Quản trị Nguồn hàng</div>
+
             <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
-            <a href="manage-properties.html" class="nav-item active"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
+            <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
+
             <div class="divider"></div>
-            <div class="nav-heading">Nghiệp vụ Sales</div>
+
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
             <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
             <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Nhân viên sales</a>
-            <a href="manage-news.html" class="nav-item active"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
+
+            <a href="manage-employees.html" id="menu-employees" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
+
+            <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
 
@@ -224,23 +228,59 @@
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("adminName").innerText = localStorage.getItem("username") || "Sales";
-            fetch('/api/BatDongSan').then(res => res.json()).then(data => {
+        document.addEventListener("DOMContentLoaded", async () => {
+            // 1. KIỂM TRA QUYỀN TRUY CẬP (Bảo mật tuyệt đối)
+            const role = localStorage.getItem("role");
+            const username = localStorage.getItem("username");
+
+            if (role !== "Admin" && role !== "Sales") {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 2. NẾU LÀ SALES 
+            if (role === "Sales") {
+                const empMenu = document.getElementById("menu-employees");
+                if (empMenu) {
+                    empMenu.style.display = "none";
+                }
+            }
+
+            // 3. HIỂN THỊ TÊN NGƯỜI ĐĂNG NHẬP
+            document.getElementById("adminName").innerText = username || "Admin";
+
+            // 4. TẢI VÀ HIỂN THỊ DANH SÁCH BẤT ĐỘNG SẢN
+            try {
+                const res = await fetch('/api/BatDongSan');
+                const data = await res.json();
+
                 let html = '';
-                if (data.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Chưa có BĐS nào</td></tr>';
-                data.forEach(p => {
-                    const img = p.hinhAnhUrl || `https://loremflickr.com/400/300/house?lock=${p.id}`;
-                    html += `<tr>
-                            <td><img src="${img}" class="img-thumb"></td>
-                            <td><strong style="color:var(--primary); font-size:15px;">${p.tieuDe}</strong><br><small><i class="fas fa-map-marker-alt"></i> ${p.diaChi}</small></td>
-                            <td><strong style="background:var(--success); color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${p.loaiHinh}</strong></td>
-                            <td><strong style="color:var(--danger); font-size:16px;">${p.gia.toLocaleString('vi-VN')} đ</strong></td>
-                            <td><a href="edit-property.html?id=${p.id}" class="action-btn"><i class="fas fa-edit"></i> Sửa</a></td>
-                        </tr>`;
-                });
+                if (data.length === 0) {
+                    html = '<tr><td colspan="5" style="text-align:center;">Chưa có BĐS nào</td></tr>';
+                } else {
+
+                    data.reverse().forEach(p => {
+                        const img = p.hinhAnhUrl || `https://loremflickr.com/400/300/house?lock=${p.id}`;
+
+                        const hinhThucLabel = p.hinhThuc ? `<span style="background:var(--warning); color:#333; padding:2px 6px; border-radius:4px; font-size:11px; margin-right:5px; font-weight:bold;">${p.hinhThuc}</span>` : '';
+
+                        html += `<tr>
+                                <td><img src="${img}" class="img-thumb" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;"></td>
+                                <td>
+                                    ${hinhThucLabel}<strong style="color:var(--primary); font-size:15px;">${p.tieuDe}</strong><br>
+                                    <small><i class="fas fa-map-marker-alt"></i> ${p.diaChi}</small>
+                                </td>
+                                <td><strong style="background:var(--success); color:white; padding:4px 8px; border-radius:4px; font-size:12px;">${p.loaiHinh}</strong></td>
+                                <td><strong style="color:var(--danger); font-size:16px;">${p.gia.toLocaleString('vi-VN')} đ</strong></td>
+                                <td><a href="edit-property.html?id=${p.id}" class="action-btn"><i class="fas fa-edit"></i> Sửa</a></td>
+                            </tr>`;
+                    });
+                }
                 document.getElementById('bds-list').innerHTML = html;
-            });
+            } catch (error) {
+                console.error("Lỗi khi tải danh sách BĐS:", error);
+                document.getElementById('bds-list').innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Lỗi kết nối cơ sở dữ liệu!</td></tr>';
+            }
         });
     </script>
 </body>
