@@ -218,7 +218,6 @@
                         </div>
                     `;
 
-                // Phân quyền hiện nút sửa
                 if (["Admin", "Sales"].includes(localStorage.getItem("role"))) {
                     document.getElementById("admin-actions").innerHTML = `
                             <a href="edit-property.html?id=${item.id}" style="background: #ffc107; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
@@ -232,19 +231,50 @@
 
         async function clientBookAppointment(propertyId) {
             const username = localStorage.getItem("username");
-            if (!username) { alert("Vui lòng đăng nhập!"); window.location.href = "login.html"; return; }
+            if (!username) {
+                alert("Vui lòng đăng nhập để đặt lịch!");
+                window.location.href = "login.html";
+                return;
+            }
 
-            const appDate = document.getElementById("clientAppDate").value;
-            if (!appDate) return alert("Chọn ngày giờ!");
+            const appDateStr = document.getElementById("clientAppDate").value;
+            if (!appDateStr) {
+                alert("Vui lòng chọn ngày và giờ hẹn!");
+                return;
+            }
+
+            const selectedDate = new Date(appDateStr);
+            const currentDate = new Date();
+
+            if (selectedDate <= currentDate) {
+                alert("Lỗi: Thời gian hẹn phải lớn hơn thời gian hiện tại!");
+                return;
+            }
 
             try {
                 const res = await fetch('/api/Appointment', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ customerId: username, propertyId: propertyId, appointmentDate: appDate })
+                    body: JSON.stringify({
+                        customerId: username,
+                        propertyId: propertyId,
+                        appointmentDate: appDateStr
+                    })
                 });
-                if (res.ok) document.getElementById("bookMsg").innerHTML = "Đã gửi yêu cầu!";
-            } catch (err) { alert("Lỗi!"); }
+
+                if (res.ok) {
+                    const msgBox = document.getElementById("bookMsg");
+                    msgBox.style.color = "green";
+                    msgBox.innerHTML = "<i class='fas fa-check-circle'></i> Đã gửi yêu cầu đặt lịch thành công! Nhân viên sẽ liên hệ lại với bạn.";
+
+                    document.getElementById("clientAppDate").value = "";
+                } else {
+                    alert("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại!");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Lỗi kết nối đến máy chủ!");
+            }
         }
     </script>
 </body>

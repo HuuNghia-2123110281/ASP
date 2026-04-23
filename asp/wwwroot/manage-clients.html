@@ -6,6 +6,7 @@
     <title>Lịch hẹn xem nhà - BĐS Nghĩa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+
         :root {
             --primary: #4e73df;
             --primary-dark: #224abe;
@@ -14,6 +15,7 @@
             --danger: #e74a3b;
             --dark: #5a5c69;
             --bg-light: #f8f9fc;
+            --info: #36b9cc;
         }
 
         body {
@@ -158,6 +160,7 @@
             font-weight: bold;
         }
 
+
         .status {
             padding: 5px 10px;
             border-radius: 20px;
@@ -167,6 +170,11 @@
 
             .status.dang-cho {
                 background: #f6c23e;
+                color: #333;
+            }
+
+            .status.da-duyet {
+                background: var(--primary);
                 color: white;
             }
 
@@ -194,29 +202,28 @@
             font-size: 12px;
             color: white;
             margin-right: 5px;
+            transition: 0.2s;
         }
+
+            .action-btn:hover {
+                opacity: 0.8;
+            }
     </style>
 </head>
 <body>
     <nav class="sidebar">
         <a href="admin-dashboard.html" class="sidebar-brand"><i class="fas fa-laugh-wink"></i> BĐS NGHĨA</a>
         <div class="nav-menu">
-            <a href="admin-dashboard.html" class="nav-item active"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
-
+            <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
             <div class="divider"></div>
-
             <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
             <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
-
             <div class="divider"></div>
-
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
-            <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
+            <a href="manage-clients.html" class="nav-item active"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
             <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-
             <a href="manage-employees.html" id="menu-employees" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
-
             <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
@@ -243,7 +250,7 @@
                             <th>Hành động</th>
                         </tr>
                     </thead>
-                    <tbody id="appointment-list"><tr><td colspan="5">Đang tải...</td></tr></tbody>
+                    <tbody id="appointment-list"><tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -251,75 +258,121 @@
 
     <script>
         let customers = []; let properties = [];
+
         document.addEventListener("DOMContentLoaded", async () => {
-            // 1. Kiểm tra quyền truy cập (Chỉ Admin và Sales mới được vào)
+
             const role = localStorage.getItem("role");
             const username = localStorage.getItem("username");
             if (role !== "Admin" && role !== "Sales") {
-                window.location.href = "index.html";
-                return;
+                window.location.href = "index.html"; return;
             }
-
-
+            if (role === "Sales") {
+                const empMenu = document.getElementById("menu-employees");
+                if (empMenu) empMenu.style.display = "none";
+            }
             document.getElementById("adminName").innerText = username || "Sales";
 
+
             try {
-
                 const [resU, resP, resA] = await Promise.all([
-                    fetch('/api/User'),
-                    fetch('/api/BatDongSan'),
-                    fetch('/api/Appointment')
+                    fetch('/api/User'), fetch('/api/BatDongSan'), fetch('/api/Appointment')
                 ]);
-
                 const users = await resU.json();
                 properties = await resP.json();
-
- 
                 allApps = await resA.json();
 
+
                 customers = users.filter(u => u.role === 'KhachHang' || !u.role);
-
                 loadAppointments();
-
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu từ MongoDB:", error);
+                document.getElementById('appointment-list').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Lỗi kết nối CSDL</td></tr>`;
             }
         });
 
         function loadAppointments() {
-            fetch('/api/Appointment').then(res => res.json()).then(data => {
-                let html = '';
-                if (data.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Chưa có lịch hẹn</td></tr>';
-                data.forEach(a => {
-                    const c = customers.find(x => x.id === a.customerId) || { name: a.customerId, phone: 'Thành viên Web' };
-                    const p = properties.find(x => x.id === a.propertyId) || { tieuDe: 'BĐS đã xóa' };
-                    let stClass = "dang-cho"; let stText = "Đợi duyệt";
-                    if (a.status.includes("xem")) { stClass = "da-xem"; stText = "Đã xem"; }
-                    if (a.status.includes("hủy") || a.status.includes("Cancel")) { stClass = "da-huy"; stText = "Đã hủy"; }
-                    if (a.status.includes("chốt") || a.status.includes("hoàn tất")) { stClass = "da-chot"; stText = "Đã chốt"; }
 
-                    const d = new Date(a.appointmentDate).toLocaleString('vi-VN');
-                    html += `<tr>
-                            <td><strong>${c.name}</strong><br><small style="color:#858796">${c.phone}</small></td>
-                            <td style="color:var(--primary); font-weight:bold;">${p.tieuDe}</td>
-                            <td><i class="far fa-clock"></i> ${d}</td>
-                            <td><span class="status ${stClass}">${stText}</span></td>
-                            <td>
-                                ${stClass === 'dang-cho' ? `
-                                <button class="action-btn" style="background:var(--info)" onclick="updateStatus('${a.id}', 'Đã xem nhà')"><i class="fas fa-eye"></i> Đã xem</button>
-                                <button class="action-btn" style="background:var(--danger)" onclick="updateStatus('${a.id}', 'Đã hủy')"><i class="fas fa-times"></i> Hủy</button>
-                                ` : `<button class="action-btn" style="background:var(--success)" onclick="updateStatus('${a.id}', 'Đã chốt')"><i class="fas fa-check"></i> Đã chốt</button>`}
-                            </td>
-                        </tr>`;
-                });
-                document.getElementById('appointment-list').innerHTML = html;
+            const currentTime = new Date();
+
+            let html = '';
+            if (allApps.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Chưa có lịch hẹn</td></tr>';
+
+
+            allApps.reverse().forEach(a => {
+
+                const c = customers.find(x => x.username === a.customerId) || {};
+                const customerName = c.fullName || c.username || a.customerId || "Khách Vãng Lai";
+                const customerPhone = c.phone || "Chưa có SĐT";
+
+                const p = properties.find(x => x.id === a.propertyId) || { tieuDe: 'BĐS đã xóa' };
+
+
+                let stClass = "dang-cho"; let stText = "Đợi duyệt";
+                const statusDB = (a.status || "").toLowerCase();
+
+                if (statusDB.includes("duyệt") && !statusDB.includes("đợi")) { stClass = "da-duyet"; stText = "Đã duyệt"; }
+                if (statusDB.includes("xem")) { stClass = "da-xem"; stText = "Đã xem"; }
+                if (statusDB.includes("hủy") || statusDB.includes("cancel")) { stClass = "da-huy"; stText = "Đã hủy"; }
+                if (statusDB.includes("chốt") || statusDB.includes("hoàn tất")) { stClass = "da-chot"; stText = "Đã chốt"; }
+
+                const appDate = new Date(a.appointmentDate);
+                const isPastAppointmentTime = currentTime >= appDate;
+                const d = appDate.toLocaleString('vi-VN');
+
+
+                let actionButtons = '';
+
+                if (stClass === 'dang-cho') {
+
+                    actionButtons = `
+                            <button class="action-btn" style="background:var(--primary)" onclick="updateStatus('${a.id}', 'Đã duyệt')"><i class="fas fa-check"></i> Duyệt</button>
+                            <button class="action-btn" style="background:var(--danger)" onclick="updateStatus('${a.id}', 'Đã hủy')"><i class="fas fa-times"></i> Hủy</button>
+                        `;
+                } else if (stClass === 'da-duyet') {
+
+                    if (isPastAppointmentTime) {
+                        actionButtons = `
+                                <button class="action-btn" style="background:var(--info)" onclick="updateStatus('${a.id}', 'Đã xem nhà')"><i class="fas fa-eye"></i> Xác nhận Đã Xem</button>
+                                <button class="action-btn" style="background:var(--danger)" onclick="updateStatus('${a.id}', 'Khách Hủy')"><i class="fas fa-times"></i> Khách Hủy</button>
+                            `;
+                    } else {
+                        actionButtons = `<span style="font-size:12px; color:#858796; font-style:italic;"><i class="fas fa-hourglass-half"></i> Chưa đến giờ hẹn</span>`;
+                    }
+                } else if (stClass === 'da-xem') {
+
+                    actionButtons = `<button class="action-btn" style="background:var(--success)" onclick="updateStatus('${a.id}', 'Đã chốt')"><i class="fas fa-handshake"></i> Chốt Giao Dịch</button>`;
+                } else {
+
+                    actionButtons = `<span style="font-size:12px; font-weight:bold; color:#858796;">Lịch sử</span>`;
+                }
+
+                html += `<tr>
+                                <td><strong>${customerName}</strong><br><small style="color:#858796">${customerPhone}</small></td>
+                                <td style="color:var(--primary); font-weight:bold;">${p.tieuDe}</td>
+                                <td><i class="far fa-clock"></i> ${d}</td>
+                                <td><span class="status ${stClass}">${stText}</span></td>
+                                <td>${actionButtons}</td>
+                            </tr>`;
             });
+            document.getElementById('appointment-list').innerHTML = html;
         }
 
         async function updateStatus(id, st) {
-            if (confirm(`Xác nhận: ${st}?`)) {
-                await fetch(`/api/Appointment/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(st) });
-                loadAppointments();
+            if (confirm(`Bạn muốn chuyển lịch hẹn này sang trạng thái: ${st}?`)) {
+                try {
+                    await fetch(`/api/Appointment/${id}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(st)
+                    });
+
+                    const res = await fetch('/api/Appointment');
+                    allApps = await res.json();
+                    loadAppointments();
+
+                } catch (error) {
+                    alert("Lỗi khi cập nhật trạng thái!");
+                }
             }
         }
     </script>
