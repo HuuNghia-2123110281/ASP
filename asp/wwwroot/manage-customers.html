@@ -25,12 +25,15 @@
             overflow: hidden;
         }
 
+        /* 1. THANH SIDEBAR BÊN TRÁI (Chuẩn SB Admin 2) */
         .sidebar {
             width: 250px;
             background-image: linear-gradient(180deg, var(--primary) 10%, var(--primary-dark) 100%);
+            background-size: cover;
             color: white;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s;
             z-index: 100;
         }
 
@@ -43,8 +46,15 @@
             font-weight: 900;
             color: white;
             text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
+
+            .sidebar-brand i {
+                transform: rotate(-15deg);
+                margin-right: 10px;
+                font-size: 24px;
+            }
 
         .nav-menu {
             flex: 1;
@@ -53,16 +63,17 @@
         }
 
         .nav-heading {
-            padding: 15px 20px 5px;
+            padding: 15px 20px 5px 20px;
             font-size: 11px;
             font-weight: 800;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255, 255, 255, 0.4);
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .nav-item {
             padding: 12px 20px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -72,12 +83,22 @@
             transition: 0.2s;
         }
 
+            .nav-item i {
+                width: 20px;
+                text-align: center;
+                font-size: 16px;
+            }
+
             .nav-item:hover, .nav-item.active {
                 color: white;
             }
 
+                .nav-item.active i {
+                    color: white;
+                }
+
         .divider {
-            border-top: 1px solid rgba(255,255,255,0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
             margin: 10px 20px;
         }
 
@@ -311,17 +332,25 @@
 </head>
 <body>
     <nav class="sidebar">
-        <a href="admin-dashboard.html" class="sidebar-brand"><i class="fas fa-laugh-wink"></i> BĐS NGHĨA</a>
+        <a href="admin-dashboard.html" class="sidebar-brand">
+            <i class="fas fa-laugh-wink"></i> BĐS NGHĨA
+        </a>
+
         <div class="nav-menu">
             <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
+
             <div class="divider"></div>
             <div class="nav-heading">Quản trị Nguồn hàng</div>
+            <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
             <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
+            <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
+
             <div class="divider"></div>
             <div class="nav-heading">Nghiệp vụ Sales</div>
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
-            <a href="manage-customers.html" class="nav-item active"><i class="fas fa-fw fa-users"></i> Quản lý Khách hàng</a>
-            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Quản lý Nhân viên</a>
+            <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
+            <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
+            <a href="manage-news.html" class="nav-item active"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
 
@@ -405,11 +434,11 @@
                 if (data.length === 0) html = '<tr><td colspan="4" style="text-align:center;">Chưa có khách</td></tr>';
                 data.forEach(c => {
                     html += `<tr>
-                            <td><strong style="color:var(--primary); font-size:16px;">${c.name}</strong></td>
-                            <td>${c.phone}<br><small style="color:#858796">${c.email || 'Chưa cập nhật email'}</small></td>
-                            <td>${c.demand || 'Không rõ'}</td>
-                            <td><button class="action-btn" onclick="viewDetail('${c.id}')"><i class="fas fa-id-card"></i> Mở Hồ Sơ</button></td>
-                        </tr>`;
+                                <td><strong style="color:var(--primary); font-size:16px;">${c.name}</strong></td>
+                                <td>${c.phone}<br><small style="color:#858796">${c.email || 'Chưa cập nhật email'}</small></td>
+                                <td>${c.demand || 'Không rõ'}</td>
+                                <td><button class="action-btn" onclick="viewDetail('${c.id}')"><i class="fas fa-id-card"></i> Mở Hồ Sơ</button></td>
+                            </tr>`;
                 });
                 document.getElementById('customer-list').innerHTML = html;
             });
@@ -438,9 +467,9 @@
                 const prop = properties.find(p => p.id === a.propertyId);
                 const d = new Date(a.appointmentDate).toLocaleDateString('vi-VN');
                 interestHtml += `<div class="history-item">
-                        <div>Ngày hẹn: <b>${d}</b> - <span style="color:var(--primary)">${prop ? prop.tieuDe : 'BĐS đã xóa'}</span></div>
-                        <button class="btn-sub-detail" onclick="showAppDetail('${a.id}')">Chi tiết</button>
-                    </div>`;
+                            <div>Ngày hẹn: <b>${d}</b> - <span style="color:var(--primary)">${prop ? prop.tieuDe : 'BĐS đã xóa'}</span></div>
+                            <button class="btn-sub-detail" onclick="showAppDetail('${a.id}')">Chi tiết</button>
+                        </div>`;
             });
             document.getElementById('modalInterestList').innerHTML = interestHtml || '<div class="history-item">Chưa có lịch hẹn xem nhà.</div>';
 
@@ -449,9 +478,9 @@
             cusTrans.forEach(t => {
                 const prop = properties.find(p => p.id === t.propertyId);
                 transHtml += `<div class="history-item">
-                        <div>Loại: <b>${t.type}</b> - Giá: <strong style="color:var(--danger)">${t.price.toLocaleString('vi-VN')} đ</strong></div>
-                        <button class="btn-sub-detail" style="color:var(--success); border-color:var(--success);" onclick="showTransDetail('${t.id}')">Chi tiết</button>
-                    </div>`;
+                            <div>Loại: <b>${t.type}</b> - Giá: <strong style="color:var(--danger)">${t.price.toLocaleString('vi-VN')} đ</strong></div>
+                            <button class="btn-sub-detail" style="color:var(--success); border-color:var(--success);" onclick="showTransDetail('${t.id}')">Chi tiết</button>
+                        </div>`;
             });
             document.getElementById('modalTransList').innerHTML = transHtml || '<div class="history-item">Chưa có giao dịch.</div>';
 
@@ -465,11 +494,11 @@
             const d = new Date(a.appointmentDate).toLocaleString('vi-VN');
             document.getElementById('subTitle').innerHTML = '<i class="fas fa-calendar"></i> Chi tiết Lịch Hẹn';
             document.getElementById('subBody').innerHTML = `
-                    <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
-                    <p><strong>Thời gian:</strong> ${d}</p>
-                    <p><strong>Trạng thái:</strong> <span style="background:#f6c23e; padding:3px 8px; border-radius:4px; font-weight:bold;">${a.status}</span></p>
-                    <p><strong>Sales phụ trách (ID):</strong> ${a.userId || 'Chưa phân công'}</p>
-                `;
+                        <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
+                        <p><strong>Thời gian:</strong> ${d}</p>
+                        <p><strong>Trạng thái:</strong> <span style="background:#f6c23e; padding:3px 8px; border-radius:4px; font-weight:bold;">${a.status}</span></p>
+                        <p><strong>Sales phụ trách (ID):</strong> ${a.userId || 'Chưa phân công'}</p>
+                    `;
             document.getElementById('subDetailModal').style.display = 'flex';
         }
 
@@ -478,12 +507,12 @@
             const p = properties.find(x => x.id === t.propertyId);
             document.getElementById('subTitle').innerHTML = '<i class="fas fa-handshake" style="color:var(--success);"></i> Chi tiết Giao Dịch';
             document.getElementById('subBody').innerHTML = `
-                    <p><strong>Mã GD:</strong> #${t.id}</p>
-                    <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
-                    <p><strong>Loại hợp đồng:</strong> ${t.type}</p>
-                    <p><strong>Giá trị chốt:</strong> <span style="color:var(--danger); font-weight:bold; font-size:18px;">${t.price.toLocaleString('vi-VN')} đ</span></p>
-                    <p><strong>Trạng thái:</strong> ${t.status}</p>
-                `;
+                        <p><strong>Mã GD:</strong> #${t.id}</p>
+                        <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
+                        <p><strong>Loại hợp đồng:</strong> ${t.type}</p>
+                        <p><strong>Giá trị chốt:</strong> <span style="color:var(--danger); font-weight:bold; font-size:18px;">${t.price.toLocaleString('vi-VN')} đ</span></p>
+                        <p><strong>Trạng thái:</strong> ${t.status}</p>
+                    `;
             document.getElementById('subDetailModal').style.display = 'flex';
         }
     </script>
