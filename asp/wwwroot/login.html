@@ -61,16 +61,40 @@
             margin-top: 15px;
             word-wrap: break-word;
         }
+
+        .forgot-pass {
+            text-align: right;
+            margin-top: -5px;
+            margin-bottom: 15px;
+        }
+
+            .forgot-pass a {
+                font-size: 13px;
+                color: #1a73e8;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+                .forgot-pass a:hover {
+                    text-decoration: underline;
+                }
     </style>
 </head>
 <body>
     <div class="login-card">
         <h2 style="text-align:center; color: #1a73e8; margin-top: 0;">ĐĂNG NHẬP</h2>
-        <input type="text" id="username" placeholder="Tên đăng nhập">
+
+        <input type="text" id="username" placeholder="Tên đăng nhập (Số điện thoại)">
         <input type="password" id="password" placeholder="Mật khẩu">
+
+        <div class="forgot-pass">
+            <a href="forgot-password.html">Quên mật khẩu?</a>
+        </div>
+
         <button id="btnLogin" onclick="handleLogin()">Đăng nhập</button>
         <p id="message"></p>
-        <p style="text-align:center; font-size:13px; margin-top: 20px;">Chưa có tài khoản? <a href="register.html" style="color: #1a73e8;">Đăng ký ngay</a></p>
+
+        <p style="text-align:center; font-size:13px; margin-top: 20px;">Chưa có tài khoản? <a href="register.html" style="color: #1a73e8; font-weight: bold;">Đăng ký ngay</a></p>
         <div style="text-align:center; margin-top: 10px;"><a href="index.html" style="font-size:12px; color:#666; text-decoration:none;">< Về trang chủ</a></div>
     </div>
 
@@ -117,7 +141,11 @@
                     localStorage.setItem("role", result.role);
 
                     setTimeout(() => {
-                        window.location.href = "index.html";
+                        if (result.role === "Admin" || result.role === "Sales") {
+                            window.location.href = "admin-dashboard.html";
+                        } else {
+                            window.location.href = "index.html";
+                        }
                     }, 1000);
                 } else {
                     messageBox.style.color = "red";

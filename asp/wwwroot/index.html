@@ -504,9 +504,9 @@
             <div class="search-main-row">
                 <select id="searchType">
                     <option value="Tất cả">Loại nhà đất</option>
-                    <option value="Căn hộ">Căn hộ chung cư</option>
-                    <option value="Nhà phố">Nhà riêng / Nhà phố</option>
-                    <option value="Biệt thự">Biệt thự / Liền kề</option>
+                    <option value="Căn hộ">Căn hộ/Chung cư</option>
+                    <option value="Nhà phố">Nhà phố/Liền kề</option>
+                    <option value="Biệt thự">Biệt thự </option>
                     <option value="Đất nền">Đất nền dự án</option>
                 </select>
                 <input type="text" id="searchKeyword" placeholder="Nhập thông tin dự án, địa chỉ, từ khóa...">
@@ -516,7 +516,15 @@
             <div class="search-filters-row">
                 <select class="filter-pill"><option>Toàn quốc</option></select>
                 <select id="searchPrice" class="filter-pill"></select>
-                <select class="filter-pill"><option>Diện tích</option></select>
+
+                <select id="searchArea" class="filter-pill">
+                    <option value="">Diện tích</option>
+                    <option value="0-50">Dưới 50 m²</option>
+                    <option value="50-100">50 – 100 m²</option>
+                    <option value="100-150">100 – 150 m²</option>
+                    <option value="150-99999">Trên 150 m²</option>
+                </select>
+
                 <select class="filter-pill"><option>Tuỳ chọn thêm</option></select>
                 <button class="btn-reset" onclick="resetFilters()" title="Đặt lại"><i class="fas fa-sync-alt"></i></button>
             </div>
@@ -547,16 +555,16 @@
                 }
 
                 menuHTML += `
-                    <div class="dropdown" style="margin-left: 15px;">
-                        <div class="user-greeting">
-                            <i class="fas fa-user-circle" style="font-size: 22px; color: #4da3ff;"></i>
-                            ${fullName} <i class="fas fa-angle-down" style="font-size: 12px; margin-left: 2px;"></i>
-                        </div>
-                        <div class="dropdown-content user-dropdown-content">
-                            <a href="profile.html"><i class="fas fa-id-badge" style="width:20px; color:var(--primary);"></i> Hồ sơ cá nhân</a>
-                            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt" style="width:20px; color:var(--danger);"></i> Đăng xuất</a>
-                        </div>
-                    </div>`;
+                        <div class="dropdown" style="margin-left: 15px;">
+                            <div class="user-greeting">
+                                <i class="fas fa-user-circle" style="font-size: 22px; color: #4da3ff;"></i>
+                                ${fullName} <i class="fas fa-angle-down" style="font-size: 12px; margin-left: 2px;"></i>
+                            </div>
+                            <div class="dropdown-content user-dropdown-content">
+                                <a href="profile.html"><i class="fas fa-id-badge" style="width:20px; color:var(--primary);"></i> Hồ sơ cá nhân</a>
+                                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt" style="width:20px; color:var(--danger);"></i> Đăng xuất</a>
+                            </div>
+                        </div>`;
 
                 authSection.innerHTML = menuHTML;
             }
@@ -588,6 +596,7 @@
             document.getElementById("searchType").value = type;
             document.getElementById("searchKeyword").value = "";
             document.getElementById("searchPrice").value = "";
+            document.getElementById("searchArea").value = "";
             document.getElementById("main-title").innerText = mode === 'ban' ? `Nhà đất bán: ${type}` : `Nhà đất cho thuê: ${type}`;
             executeAdvancedSearch();
             document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
@@ -597,6 +606,7 @@
             document.getElementById("searchKeyword").value = "";
             document.getElementById("searchType").value = "Tất cả";
             document.getElementById("searchPrice").value = "";
+            document.getElementById("searchArea").value = "";
             loadData();
         }
 
@@ -609,16 +619,28 @@
             const keyword = document.getElementById("searchKeyword").value.trim();
             const type = document.getElementById("searchType").value;
             const priceRange = document.getElementById("searchPrice").value;
+            const areaRange = document.getElementById("searchArea").value;
+
             document.getElementById("main-title").innerText = `Kết quả tìm kiếm`;
 
             let minPrice = "", maxPrice = "";
             if (priceRange) [minPrice, maxPrice] = priceRange.split('-');
 
+
+            let minArea = "", maxArea = "";
+            if (areaRange) [minArea, maxArea] = areaRange.split('-');
+
             let url = `/api/BatDongSan/filter?`;
             if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
             if (type !== "Tất cả") url += `loaiHinh=${encodeURIComponent(type)}&`;
             if (minPrice) url += `minGia=${minPrice}&`;
-            if (maxPrice) url += `maxGia=${maxPrice}`;
+            if (maxPrice) url += `maxGia=${maxPrice}&`;
+            if (minArea) url += `minDienTich=${minArea}&`;
+            if (maxArea) url += `maxDienTich=${maxArea}&`;
+
+            if (url.endsWith('&') || url.endsWith('?')) {
+                url = url.slice(0, -1);
+            }
 
             document.getElementById('list-bds').innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</p>';
             fetch(url).then(res => res.json()).then(data => renderProperties(data, keyword)).catch(e => console.log(e));
@@ -631,21 +653,21 @@
                 data.forEach(item => {
                     const realImg = item.hinhAnhUrl || `https://loremflickr.com/400/300/house?lock=${item.id}`;
                     html += `
-                            <div class="card" onclick="viewDetail('${item.id}')">
-                                <div style="position:relative;">
-                                    <img src="${realImg}" class="card-img">
-                                    <span class="price-tag">${item.gia.toLocaleString('vi-VN')} đ</span>
-                                </div>
-                                <div class="card-content">
-                                    <small style="color:var(--primary); font-weight:bold; text-transform:uppercase;">${item.loaiHinh}</small>
-                                    <h3 style="margin: 8px 0; font-size:18px; color:var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.tieuDe}</h3>
-                                    <p style="color: #666; font-size: 13px; margin:0;"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</p>
-                                    <div class="info-row">
-                                        <span><i class="fas fa-bed"></i> ${item.phongNgu || 0} PN</span>
-                                        <span><i class="fas fa-expand"></i> ${item.dienTich || 0} m²</span>
+                                <div class="card" onclick="viewDetail('${item.id}')">
+                                    <div style="position:relative;">
+                                        <img src="${realImg}" class="card-img">
+                                        <span class="price-tag">${item.gia.toLocaleString('vi-VN')} đ</span>
                                     </div>
-                                </div>
-                            </div>`;
+                                    <div class="card-content">
+                                        <small style="color:var(--primary); font-weight:bold; text-transform:uppercase;">${item.loaiHinh}</small>
+                                        <h3 style="margin: 8px 0; font-size:18px; color:var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.tieuDe}</h3>
+                                        <p style="color: #666; font-size: 13px; margin:0;"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</p>
+                                        <div class="info-row">
+                                            <span><i class="fas fa-bed"></i> ${item.phongNgu || 0} PN</span>
+                                            <span><i class="fas fa-expand"></i> ${item.dienTich || 0} m²</span>
+                                        </div>
+                                    </div>
+                                </div>`;
                 });
             }
             document.getElementById('list-bds').innerHTML = html;
@@ -658,10 +680,10 @@
                 if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center;">Chưa có dự án nào.</p>';
                 data.forEach(p => {
                     html += `<div class="card" style="padding: 25px; border-top: 4px solid var(--success);">
-                            <h3 style="color: var(--primary); margin: 0 0 10px 0; font-size: 22px;">${p.name}</h3>
-                            <p style="color: var(--dark); font-size: 14px;"><strong>Chủ đầu tư:</strong> ${p.investor || 'Đang cập nhật'}</p>
-                            <button style="width: 100%; margin-top: 10px; padding: 8px; background: white; border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; font-weight: bold;">Xem chi tiết</button>
-                        </div>`;
+                                <h3 style="color: var(--primary); margin: 0 0 10px 0; font-size: 22px;">${p.name}</h3>
+                                <p style="color: var(--dark); font-size: 14px;"><strong>Chủ đầu tư:</strong> ${p.investor || 'Đang cập nhật'}</p>
+                                <button style="width: 100%; margin-top: 10px; padding: 8px; background: white; border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; font-weight: bold;">Xem chi tiết</button>
+                            </div>`;
                 });
                 document.getElementById('list-bds').innerHTML = html;
                 document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
@@ -677,14 +699,14 @@
                 data.forEach(n => {
                     const date = new Date(n.createdAt).toLocaleDateString('vi-VN');
                     html += `
-                        <div class="card" style="display: flex; flex-direction: column;">
-                            <img src="${n.imageUrl}" style="width: 100%; height: 200px; object-fit: cover;">
-                            <div style="padding: 20px;">
-                                <small style="color: var(--gray);"><i class="far fa-clock"></i> ${date} - ${n.author}</small>
-                                <h3 style="margin: 10px 0; color: var(--dark); font-size: 18px;">${n.title}</h3>
-                                <p style="color: #666; font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${n.description}</p>
-                            </div>
-                        </div>`;
+                            <div class="card" style="display: flex; flex-direction: column;">
+                                <img src="${n.imageUrl}" style="width: 100%; height: 200px; object-fit: cover;">
+                                <div style="padding: 20px;">
+                                    <small style="color: var(--gray);"><i class="far fa-clock"></i> ${date} - ${n.author}</small>
+                                    <h3 style="margin: 10px 0; color: var(--dark); font-size: 18px;">${n.title}</h3>
+                                    <p style="color: #666; font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${n.description}</p>
+                                </div>
+                            </div>`;
                 });
                 document.getElementById('list-bds').innerHTML = html;
                 document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
