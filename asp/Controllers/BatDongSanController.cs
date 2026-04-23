@@ -156,14 +156,16 @@ namespace asp.Controllers
         // 7. TÌM KIẾM NÂNG CAO (LỌC THEO TIÊU CHÍ)
         [HttpGet("filter")]
         public async Task<ActionResult<IEnumerable<BatDongSan>>> FilterBatDongSan(
-            [FromQuery] string? keyword,
-            [FromQuery] string? loaiHinh,
-            [FromQuery] double? minGia,
-            [FromQuery] double? maxGia)
+    [FromQuery] string? keyword,
+    [FromQuery] string? loaiHinh,
+    [FromQuery] double? minGia,
+    [FromQuery] double? maxGia,
+    [FromQuery] double? minDienTich,
+    [FromQuery] double? maxDienTich)
         {
             var builder = Builders<BatDongSan>.Filter;
             var filter = builder.Empty;
-
+            // 1. Lọc theo từ khóa
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 var keywordFilter = builder.Or(
@@ -172,12 +174,12 @@ namespace asp.Controllers
                 );
                 filter &= keywordFilter;
             }
-
+            // 2. Lọc theo loại hình
             if (!string.IsNullOrWhiteSpace(loaiHinh) && loaiHinh != "Tất cả")
             {
                 filter &= builder.Eq(x => x.LoaiHinh, loaiHinh);
             }
-
+            // 3. Lọc theo giá
             if (minGia.HasValue)
             {
                 filter &= builder.Gte(x => x.Gia, minGia.Value);
@@ -186,7 +188,15 @@ namespace asp.Controllers
             {
                 filter &= builder.Lte(x => x.Gia, maxGia.Value);
             }
-
+            // 4. LỌC THEO DIỆN TÍCH
+            if (minDienTich.HasValue)
+            {
+                filter &= builder.Gte(x => x.DienTich, minDienTich.Value);
+            }
+            if (maxDienTich.HasValue)
+            {
+                filter &= builder.Lte(x => x.DienTich, maxDienTich.Value);
+            }
             var list = await _bdsCollection.Find(filter)
                 .SortByDescending(x => x.Id)
                 .ToListAsync();

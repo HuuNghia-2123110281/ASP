@@ -26,5 +26,8 @@ namespace asp.Data
 
         [BsonElement("Role")]
         public string? Role { get; set; }
+
+        public string? ResetOtp { get; set; }
+        public DateTime? OtpExpiry { get; set; }
     }
 }
