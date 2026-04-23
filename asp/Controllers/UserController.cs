@@ -22,7 +22,7 @@ namespace asp.Controllers
         public async Task<ActionResult<IEnumerable<object>>> GetAllUsers()
         {
             var users = await _userCollection.Find(_ => true)
-                .Project(u => new { u.Id, u.Username, u.FullName, u.Email, u.Role })
+                .Project(u => new { u.Id, u.Username, u.FullName, u.Email, u.Phone, u.Role })
                 .ToListAsync();
             return Ok(users);
         }
