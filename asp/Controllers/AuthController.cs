@@ -75,7 +75,7 @@ namespace asp.Controllers
             var user = await _userCollection.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
 
             if (user == null)
-                return BadRequest(new { message = "Số điện thoại này chưa được đăng ký!", developer = "Nguyen Huu Nghia" });
+                return BadRequest(new { message = "Gmail này chưa được đăng ký!", developer = "Nguyen Huu Nghia" });
 
             if (string.IsNullOrEmpty(user.Email))
                 return BadRequest(new { message = "Tài khoản này chưa liên kết Email. Vui lòng liên hệ Admin!", developer = "Nguyen Huu Nghia" });
@@ -92,11 +92,11 @@ namespace asp.Controllers
             try
             {
 
-                var fromAddress = new MailAddress("THAY-EMAIL-CỦA-BẠN-VÀO-ĐÂY@gmail.com", "BĐS Hỗ Trợ");
+                var fromAddress = new MailAddress("nguyenhuunghia03052004@gmail.com", "BĐS Hỗ Trợ");
                 var toAddress = new MailAddress(user.Email);
 
 
-                const string fromPassword = "xxxxxxxxxxxxxxxx";
+                const string fromPassword = "fgiidufvbljcasrj";
 
                 var smtp = new SmtpClient
                 {
