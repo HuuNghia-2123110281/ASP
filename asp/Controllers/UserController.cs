@@ -28,23 +28,25 @@ namespace asp.Controllers
         }
 
 
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetProfile(string username)
+        [HttpPut("{username}")]
+        public async Task<IActionResult> UpdateProfile(string username, [FromBody] User updatedInfo)
         {
             var user = await _userCollection.Find(u => u.Username == username).FirstOrDefaultAsync();
-
             if (user == null)
             {
                 return NotFound(new { message = "Không tìm thấy thông tin người dùng!" });
             }
 
+            if (!string.IsNullOrEmpty(updatedInfo.FullName)) user.FullName = updatedInfo.FullName;
+            if (!string.IsNullOrEmpty(updatedInfo.Email)) user.Email = updatedInfo.Email;
+            if (!string.IsNullOrEmpty(updatedInfo.Phone)) user.Phone = updatedInfo.Phone;
+
+            await _userCollection.ReplaceOneAsync(u => u.Username == username, user);
+
             return Ok(new
             {
-                username = user.Username,
-                fullName = user.FullName ?? user.Username,
-                email = user.Email,
-                phone = user.Phone,
-                role = user.Role
+                message = "Cập nhật hồ sơ thành công!",
+                fullName = user.FullName
             });
         }
 

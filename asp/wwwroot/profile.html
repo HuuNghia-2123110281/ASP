@@ -12,6 +12,7 @@
             --success: #00a652;
             --bg: #f4f7f6;
             --warning: #f6c23e;
+            --accent: #e91e63;
         }
 
         body {
@@ -97,13 +98,14 @@
             padding: 4px 10px;
             border-radius: 20px;
             background: var(--warning);
-            display: inline-block;
+            display: none;
             margin-bottom: 20px;
         }
 
+
         .info-list {
             text-align: left;
-            margin: 20px 0;
+            margin: 10px 0 20px 0;
             font-size: 14px;
             color: #555;
             background: #f8f9fa;
@@ -132,11 +134,61 @@
                 text-align: center;
             }
 
+        .edit-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            display: none;
+        }
+
+            .edit-input:focus {
+                border-color: var(--primary);
+            }
+
+        .btn-edit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+            .btn-edit:hover {
+                background: #1557b0;
+            }
+
+        .btn-save {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: 0.3s;
+            display: none;
+        }
+
+            .btn-save:hover {
+                background: #008a44;
+            }
+
         .btn-logout {
             background: #ffebee;
             color: #dc3545;
             border: none;
-            padding: 10px 20px;
+            padding: 10px;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
@@ -243,6 +295,7 @@
             font-size: 12px;
             font-weight: bold;
             color: white;
+            text-align: center;
         }
 
         .st-success {
@@ -256,6 +309,99 @@
 
         .st-danger {
             background: #dc3545;
+        }
+
+        .btn-detail {
+            background: white;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+            .btn-detail:hover {
+                background: var(--primary);
+                color: white;
+            }
+
+            .btn-detail.success {
+                border-color: var(--success);
+                color: var(--success);
+            }
+
+                .btn-detail.success:hover {
+                    background: var(--success);
+                    color: white;
+                }
+
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1050;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+            .modal-header h3 {
+                margin: 0;
+                color: var(--primary);
+                font-size: 20px;
+            }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+            .modal-close:hover {
+                color: var(--danger);
+            }
+
+        .modal-body p {
+            margin: 12px 0;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        .modal-body strong {
+            color: var(--dark);
+            width: 130px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -271,15 +417,30 @@
     <div class="profile-container">
         <div class="sidebar-profile">
             <div class="avatar" id="userAvatar"><i class="fas fa-spinner fa-spin"></i></div>
+
             <h2 class="user-name" id="userFullName">Đang tải...</h2>
+            <input type="text" id="editFullName" class="edit-input" style="text-align: center; margin-bottom: 10px; font-weight: bold;" placeholder="Nhập họ và tên...">
+
             <div class="user-role" id="userRoleTitle">...</div>
 
             <div class="info-list">
-                <p><i class="fas fa-user"></i> <strong style="width:70px;">ID Tên:</strong> <span id="userId">Đang tải...</span></p>
-                <p><i class="fas fa-phone-alt"></i> <strong style="width:70px;">SĐT:</strong> <span id="userPhone">Đang tải...</span></p>
-                <p><i class="fas fa-envelope"></i> <strong style="width:70px;">Email:</strong> <span id="userEmail">Đang tải...</span></p>
+                <p><i class="fas fa-user"></i> <strong style="width:50px;">ID:</strong> <span id="userId">Đang tải...</span></p>
+                <p>
+                    <i class="fas fa-phone-alt"></i> <strong style="width:50px;">SĐT:</strong>
+                    <span id="userPhone">Đang tải...</span>
+                    <input type="tel" id="editPhone" class="edit-input" placeholder="Nhập số điện thoại...">
+                </p>
+                <p>
+                    <i class="fas fa-envelope"></i> <strong style="width:50px;">Email:</strong>
+                    <span id="userEmail">Đang tải...</span>
+                    <input type="email" id="editEmail" class="edit-input" placeholder="Nhập email...">
+                </p>
             </div>
 
+            <p id="editMsg" style="font-size: 13px; font-weight: bold; margin-bottom: 10px;"></p>
+
+            <button class="btn-edit" id="btnToggleEdit" onclick="toggleEditMode()"><i class="fas fa-edit"></i> Chỉnh sửa hồ sơ</button>
+            <button class="btn-save" id="btnSaveProfile" onclick="saveProfile()"><i class="fas fa-save"></i> Lưu thay đổi</button>
             <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất ngay</button>
         </div>
 
@@ -301,16 +462,33 @@
         </div>
     </div>
 
+    <div id="detailModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Chi tiết</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+            <div style="text-align: right; margin-top: 25px;">
+                <button onclick="closeModal()" style="background: #f4f7f6; color: #333; border: 1px solid #ccc; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Đóng cửa sổ</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Lấy ID đăng nhập (Không dấu)
         const localUsername = localStorage.getItem("username");
-        // Lấy tên thật (Có dấu) mà lúc nãy ta vừa sửa trong login.html
-        const localFullName = localStorage.getItem("fullName") || localUsername;
+        let isEditing = false;
+
+
+        let globalProperties = [];
+        let globalAppointments = [];
+        let globalTransactions = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             if (!localUsername) { window.location.href = "login.html"; return; }
 
-            // Đắp tạm tên lên giao diện cho đẹp trong lúc đợi DB tải
+            const localFullName = localStorage.getItem("fullName") || localUsername;
             document.getElementById('userFullName').innerText = localFullName;
             document.getElementById('userAvatar').innerText = localFullName.charAt(0).toUpperCase();
 
@@ -339,20 +517,86 @@
                     document.getElementById('userPhone').innerText = dbUser.phone || 'Chưa cập nhật';
                     document.getElementById('userEmail').innerText = dbUser.email || 'Chưa cập nhật';
 
-                    let roleDisplay = 'Thành viên Web';
-                    if (dbUser.role === 'Admin') roleDisplay = 'Quản trị viên Hệ thống';
-                    if (dbUser.role === 'Sales') roleDisplay = 'Nhân viên Kinh doanh';
-                    document.getElementById('userRoleTitle').innerText = roleDisplay;
+                    document.getElementById('editFullName').value = dbUser.fullName;
+                    document.getElementById('editPhone').value = dbUser.phone || '';
+                    document.getElementById('editEmail').value = dbUser.email || '';
 
-                } else {
-                    document.getElementById('userFullName').innerText = "Lỗi tải Profile";
-                    document.getElementById('userAvatar').innerHTML = "<i class='fas fa-exclamation'></i>";
+
+                    const roleTitle = document.getElementById('userRoleTitle');
+                    if (dbUser.role === 'Admin') {
+                        roleTitle.innerText = 'Quản trị viên Hệ thống';
+                        roleTitle.style.display = 'inline-block';
+                    } else if (dbUser.role === 'Sales') {
+                        roleTitle.innerText = 'Nhân viên Kinh doanh';
+                        roleTitle.style.display = 'inline-block';
+                    } else {
+
+                        roleTitle.style.display = 'none';
+                    }
                 }
-            } catch (err) {
-                console.error("Lỗi MongoDB:", err);
-                document.getElementById('userFullName').innerText = "Lỗi kết nối mạng";
-                document.getElementById('userAvatar').innerHTML = "<i class='fas fa-exclamation'></i>";
+            } catch (err) { console.error("Lỗi MongoDB:", err); }
+        }
+
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            const spans = [document.getElementById('userFullName'), document.getElementById('userPhone'), document.getElementById('userEmail')];
+            const inputs = [document.getElementById('editFullName'), document.getElementById('editPhone'), document.getElementById('editEmail')];
+
+            if (isEditing) {
+                spans.forEach(s => s.style.display = 'none');
+                inputs.forEach(i => { i.style.display = 'block'; i.style.flex = '1'; });
+
+                document.getElementById('btnToggleEdit').innerHTML = '<i class="fas fa-times"></i> Hủy chỉnh sửa';
+                document.getElementById('btnToggleEdit').style.background = '#858796';
+                document.getElementById('btnSaveProfile').style.display = 'block';
+                document.getElementById('editMsg').innerText = "";
+            } else {
+                spans.forEach(s => s.style.display = 'block');
+                inputs.forEach(i => i.style.display = 'none');
+
+                document.getElementById('btnToggleEdit').innerHTML = '<i class="fas fa-edit"></i> Chỉnh sửa hồ sơ';
+                document.getElementById('btnToggleEdit').style.background = 'var(--primary)';
+                document.getElementById('btnSaveProfile').style.display = 'none';
+                loadUserProfileFromDB();
             }
+        }
+
+        async function saveProfile() {
+            const btnSave = document.getElementById('btnSaveProfile');
+            const msg = document.getElementById('editMsg');
+            const updatedData = {
+                FullName: document.getElementById('editFullName').value.trim(),
+                Phone: document.getElementById('editPhone').value.trim(),
+                Email: document.getElementById('editEmail').value.trim()
+            };
+
+            if (!updatedData.FullName || !updatedData.Phone) {
+                msg.style.color = "red"; msg.innerText = "Tên và SĐT không được bỏ trống!"; return;
+            }
+
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+            try {
+                const response = await fetch(`/api/User/${localUsername}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    localStorage.setItem("fullName", result.fullName);
+                    msg.style.color = "green"; msg.innerText = "Đã lưu thành công!";
+                    setTimeout(() => {
+                        toggleEditMode();
+                        loadUserProfileFromDB();
+                    }, 1000);
+                } else {
+                    msg.style.color = "red"; msg.innerText = "Lưu thất bại!";
+                }
+            } catch (err) { msg.style.color = "red"; msg.innerText = "Lỗi kết nối máy chủ!"; }
+            finally { btnSave.disabled = false; btnSave.innerHTML = '<i class="fas fa-save"></i> Lưu thay đổi'; }
         }
 
         async function loadUserHistory() {
@@ -361,44 +605,63 @@
                     fetch('/api/BatDongSan'), fetch('/api/Appointment'), fetch('/api/Transaction')
                 ]);
 
-                const properties = await propRes.json();
+
+                globalProperties = await propRes.json();
                 const allApps = await appRes.json();
                 const allTrans = await transRes.json();
 
-                const myApps = allApps.filter(a => a.customerId === localUsername || a.userId === localUsername);
-                const myTrans = allTrans.filter(t => t.customerId === localUsername);
+                globalAppointments = allApps.filter(a => a.customerId === localUsername || a.userId === localUsername);
+                globalTransactions = allTrans.filter(t => t.customerId === localUsername);
+
 
                 let appHtml = '';
-                if (myApps.length === 0) appHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa đặt lịch hẹn xem nhà nào.</p>';
+                if (globalAppointments.length === 0) appHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa đặt lịch hẹn xem nhà nào.</p>';
                 else {
-                    myApps.forEach(a => {
-                        const prop = properties.find(p => p.id === a.propertyId);
+                    globalAppointments.forEach(a => {
+                        const prop = globalProperties.find(p => p.id === a.propertyId);
                         const date = new Date(a.appointmentDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
                         let stClass = "st-warning";
                         if (a.status.includes("xem")) stClass = "st-success";
                         if (a.status.includes("hủy") || a.status.includes("Cancel")) stClass = "st-danger";
 
-                        appHtml += `<div class="history-item">
-                                            <div><div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div><div class="item-date"><i class="far fa-clock"></i> Thời gian hẹn: <strong>${date}</strong></div></div>
-                                            <div><span class="status-badge ${stClass}">${a.status}</span></div>
-                                        </div>`;
+                        appHtml += `
+                                <div class="history-item">
+                                    <div style="flex: 1; padding-right: 15px;">
+                                        <div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div>
+                                        <div class="item-date"><i class="far fa-clock"></i> Thời gian hẹn: <strong>${date}</strong></div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                        <span class="status-badge ${stClass}" style="width: 100%; box-sizing: border-box;">${a.status}</span>
+                                        <button class="btn-detail" onclick="showAppDetail('${a.id}')"><i class="fas fa-search"></i> Xem chi tiết</button>
+                                    </div>
+                                </div>
+                            `;
                     });
                 }
                 document.getElementById('appointment-list').innerHTML = appHtml;
 
+
                 let transHtml = '';
-                if (myTrans.length === 0) transHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa có giao dịch bất động sản nào.</p>';
+                if (globalTransactions.length === 0) transHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa có giao dịch bất động sản nào.</p>';
                 else {
-                    myTrans.forEach(t => {
-                        const prop = properties.find(p => p.id === t.propertyId);
+                    globalTransactions.forEach(t => {
+                        const prop = globalProperties.find(p => p.id === t.propertyId);
                         let stClass = "st-warning";
                         if (t.status === "Hoàn tất" || t.status === "Completed") stClass = "st-success";
                         if (t.status === "Đã hủy" || t.status === "Cancelled") stClass = "st-danger";
 
-                        transHtml += `<div class="history-item" style="border-left-color: var(--success);">
-                                            <div><div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div><div class="item-date">Loại hợp đồng: <strong>${t.type}</strong> - Giá trị: <strong style="color:var(--accent); font-size:15px;">${t.price.toLocaleString('vi-VN')} đ</strong></div></div>
-                                            <div><span class="status-badge ${stClass}">${t.status}</span></div>
-                                        </div>`;
+                        transHtml += `
+                                <div class="history-item" style="border-left-color: var(--success);">
+                                    <div style="flex: 1; padding-right: 15px;">
+                                        <div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div>
+                                        <div class="item-date">Loại hợp đồng: <strong>${t.type}</strong> - Giá trị: <strong style="color:var(--accent); font-size:15px;">${t.price.toLocaleString('vi-VN')} đ</strong></div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                        <span class="status-badge ${stClass}" style="width: 100%; box-sizing: border-box;">${t.status}</span>
+                                        <button class="btn-detail success" onclick="showTransDetail('${t.id}')"><i class="fas fa-search"></i> Xem chi tiết</button>
+                                    </div>
+                                </div>
+                            `;
                     });
                 }
                 document.getElementById('transaction-list').innerHTML = transHtml;
@@ -407,6 +670,48 @@
                 document.getElementById('appointment-list').innerHTML = '<p style="color:red; text-align:center;">Lỗi kết nối cơ sở dữ liệu.</p>';
                 document.getElementById('transaction-list').innerHTML = '<p style="color:red; text-align:center;">Lỗi kết nối cơ sở dữ liệu.</p>';
             }
+        }
+
+        function showAppDetail(appId) {
+            const app = globalAppointments.find(a => a.id === appId);
+            const prop = globalProperties.find(p => p.id === app.propertyId);
+            const date = new Date(app.appointmentDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-calendar-check"></i> Chi tiết Lịch hẹn';
+            document.getElementById('modalTitle').style.color = 'var(--primary)';
+
+            document.getElementById('modalBody').innerHTML = `
+                    <p><strong><i class="fas fa-home"></i> Bất động sản:</strong> <span style="color:var(--primary); font-weight:bold; font-size: 16px;">${prop ? prop.tieuDe : 'Đã ẩn hoặc bị xóa'}</span></p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> Địa chỉ:</strong> ${prop ? prop.diaChi : 'Không có thông tin'}</p>
+                    <p><strong><i class="far fa-clock"></i> Giờ hẹn:</strong> <span style="color:var(--danger); font-weight:bold;">${date}</span></p>
+                    <p><strong><i class="fas fa-info-circle"></i> Trạng thái:</strong> <span style="background:var(--bg); padding: 4px 10px; border-radius:4px; font-weight:bold;">${app.status}</span></p>
+                    ${prop ? `<p style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;"><strong><i class="fas fa-money-bill-wave"></i> Giá tham khảo:</strong> <span style="color:var(--success); font-weight:bold; font-size:18px;">${prop.gia.toLocaleString('vi-VN')} đ</span></p>` : ''}
+                `;
+
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function showTransDetail(transId) {
+            const trans = globalTransactions.find(t => t.id === transId);
+            const prop = globalProperties.find(p => p.id === trans.propertyId);
+            const date = trans.date ? new Date(trans.date).toLocaleString('vi-VN') : 'Đang xử lý';
+
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-file-contract"></i> Chi tiết Giao dịch';
+            document.getElementById('modalTitle').style.color = 'var(--success)';
+
+            document.getElementById('modalBody').innerHTML = `
+                    <p><strong><i class="fas fa-barcode"></i> Mã giao dịch:</strong> <span style="font-family: monospace; font-size: 16px;">#${trans.id.substring(0, 8).toUpperCase()}</span></p>
+                    <p><strong><i class="fas fa-home"></i> Bất động sản:</strong> <span style="color:var(--primary); font-weight:bold; font-size: 16px;">${prop ? prop.tieuDe : 'Đã ẩn hoặc bị xóa'}</span></p>
+                    <p><strong><i class="fas fa-file-signature"></i> Loại hợp đồng:</strong> ${trans.type || 'Mua bán'}</p>
+                    <p><strong><i class="fas fa-info-circle"></i> Trạng thái:</strong> <span style="background:var(--bg); padding: 4px 10px; border-radius:4px; font-weight:bold;">${trans.status}</span></p>
+                    <p style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;"><strong><i class="fas fa-money-bill-wave"></i> Giá chốt:</strong> <span style="color:var(--accent); font-weight:bold; font-size:22px;">${trans.price.toLocaleString('vi-VN')} đ</span></p>
+                `;
+
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
         }
     </script>
 </body>
