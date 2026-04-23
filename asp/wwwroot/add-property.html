@@ -92,6 +92,10 @@
                 color: white;
             }
 
+                .nav-item.active i {
+                    color: white;
+                }
+
         .divider {
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             margin: 10px 20px;
@@ -290,23 +294,20 @@
         <a href="admin-dashboard.html" class="sidebar-brand">
             <i class="fas fa-laugh-wink"></i> BĐS NGHĨA
         </a>
-
         <div class="nav-menu">
             <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
-
             <div class="divider"></div>
             <div class="nav-heading">Quản trị Nguồn hàng</div>
-            <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
+            <a href="add-property.html" class="nav-item active"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
             <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
-
             <div class="divider"></div>
             <div class="nav-heading">Nghiệp vụ Sales</div>
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
             <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
             <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Nhân viên sales</a>
-            <a href="manage-news.html" class="nav-item active"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
+            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
+            <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
 
@@ -331,8 +332,20 @@
 
                 <div class="row">
                     <div class="col form-group">
+                        <label>Hình thức <span style="color:red">*</span></label>
+                        <select id="hinhThuc">
+                            <option value="Bán">Bán</option>
+                            <option value="Cho thuê">Cho thuê</option>
+                        </select>
+                    </div>
+                    <div class="col form-group">
                         <label>Loại hình BĐS <span style="color:red">*</span></label>
-                        <select id="loaiHinh"><option value="">-- Đang tải --</option></select>
+                        <select id="loaiHinh">
+                            <option value="Nhà Phố/Liền kề">Nhà Phố/Liền kề</option>
+                            <option value="Căn hộ/Chung cư">Căn hộ/Chung cư</option>
+                            <option value="Đất nền">Đất nền</option>
+                            <option value="Biệt thự">Biệt thự</option>
+                        </select>
                     </div>
                     <div class="col form-group">
                         <label>Mức giá (VNĐ) <span style="color:red">*</span></label>
@@ -343,11 +356,11 @@
                 <div class="row">
                     <div class="col form-group">
                         <label>Thuộc Dự án</label>
-                        <select id="duAn"><option value="">-- Nhà lẻ --</option></select>
+                        <select id="duAn"><option value="">-- Nhà lẻ (Không thuộc dự án) --</option></select>
                     </div>
                     <div class="col form-group">
-                        <label>Chủ nhà ký gửi <span style="color:red">*</span></label>
-                        <select id="chuNha"><option value="">-- Chọn chủ nhà --</option></select>
+                        <label>Chủ nhà ký gửi <span style="color:#858796; font-size:12px; font-weight:normal;">(Có thể bỏ qua)</span></label>
+                        <select id="chuNha"><option value="">-- Chọn Chủ nhà --</option></select>
                     </div>
                 </div>
 
@@ -404,13 +417,8 @@
         function logout() { localStorage.clear(); window.location.href = "login.html"; }
 
         async function loadMasterData() {
-            fetch('/api/Category').then(res => res.json()).then(data => {
-                let html = '<option value="">-- Chọn Loại hình --</option>';
-                data.forEach(c => html += `<option value="${c.name}">${c.name}</option>`);
-                document.getElementById('loaiHinh').innerHTML = html;
-            });
             fetch('/api/Project').then(res => res.json()).then(data => {
-                let html = '<option value="">-- Nhà lẻ --</option>';
+                let html = '<option value="">-- Nhà lẻ (Không thuộc dự án) --</option>';
                 data.forEach(p => html += `<option value="${p.id}">${p.name}</option>`);
                 document.getElementById('duAn').innerHTML = html;
             });
@@ -451,6 +459,8 @@
 
             const formData = new FormData();
             formData.append("TieuDe", document.getElementById('tieuDe').value);
+            formData.append("HinhThuc", document.getElementById('hinhThuc').value);
+
             formData.append("LoaiHinh", document.getElementById('loaiHinh').value);
             formData.append("Gia", document.getElementById('gia').value);
             formData.append("DiaChi", document.getElementById('diaChi').value);
