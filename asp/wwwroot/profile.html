@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --dark: #202124;
+            --success: #00a652;
+            --bg: #f4f7f6;
+            --warning: #f6c23e;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            color: #333;
+        }
+
+        header {
+            background: var(--dark);
+            padding: 15px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #4da3ff;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 20px;
+            transition: 0.3s;
+        }
+
+            .nav-links a:hover {
+                color: #4da3ff;
+            }
+
+        .profile-container {
+            max-width: 1050px;
+            margin: 40px auto;
+            display: flex;
+            gap: 30px;
+            padding: 0 20px;
+            align-items: flex-start;
+        }
+
+
+        .sidebar-profile {
+            width: 320px;
+            background: white;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+        }
+
+        .user-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0 0 5px;
+        }
+
+        .user-role {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--warning);
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .info-list {
+            text-align: left;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #555;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+            .info-list p {
+                margin: 10px 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 1px dashed #ddd;
+                padding-bottom: 10px;
+            }
+
+                .info-list p:last-child {
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
+
+            .info-list i {
+                color: var(--primary);
+                width: 15px;
+                text-align: center;
+            }
+
+        .btn-logout {
+            background: #ffebee;
+            color: #dc3545;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+            .btn-logout:hover {
+                background: #fbc2c8;
+            }
+
+
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+            .tab-btn:hover {
+                color: var(--primary);
+            }
+
+            .tab-btn.active {
+                color: var(--primary);
+                border-bottom: 3px solid var(--primary);
+                background: white;
+            }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.3s;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .history-item {
+            border: 1px solid #eee;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            border-left: 4px solid var(--primary);
+        }
+
+            .history-item:hover {
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+                transform: translateX(3px);
+            }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .item-date {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .st-success {
+            background: var(--success);
+        }
+
+        .st-warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .st-danger {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA</a>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <div class="sidebar-profile">
+            <div class="avatar" id="userAvatar"><i class="fas fa-spinner fa-spin"></i></div>
+            <h2 class="user-name" id="userFullName">Đang tải...</h2>
+            <div class="user-role" id="userRoleTitle">...</div>
+
+            <div class="info-list">
+                <p><i class="fas fa-user"></i> <strong style="width:70px;">ID Tên:</strong> <span id="userId">Đang tải...</span></p>
+                <p><i class="fas fa-phone-alt"></i> <strong style="width:70px;">SĐT:</strong> <span id="userPhone">Đang tải...</span></p>
+                <p><i class="fas fa-envelope"></i> <strong style="width:70px;">Email:</strong> <span id="userEmail">Đang tải...</span></p>
+            </div>
+
+            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất ngay</button>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('tab-appointment', this)"><i class="fas fa-calendar-alt"></i> Lịch hẹn xem nhà</button>
+                <button class="tab-btn" onclick="switchTab('tab-transaction', this)"><i class="fas fa-handshake"></i> BĐS đã giao dịch</button>
+            </div>
+
+            <div id="tab-appointment" class="tab-content active">
+                <h3 style="margin-top:0; color:var(--dark);">Danh sách lịch hẹn của bạn</h3>
+                <div id="appointment-list"><p style="text-align:center; color:#888;"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</p></div>
+            </div>
+
+            <div id="tab-transaction" class="tab-content">
+                <h3 style="margin-top:0; color:var(--dark);">Bất động sản bạn đã chốt</h3>
+                <div id="transaction-list"><p style="text-align:center; color:#888;"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const localUsername = localStorage.getItem("username");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!localUsername) { window.location.href = "login.html"; return; }
+
+
+            loadUserProfileFromDB();
+
+
+            loadUserHistory();
+        });
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function logout() { localStorage.clear(); window.location.href = "login.html"; }
+
+         async function loadUserProfileFromDB() {
+            try {
+
+                const res = await fetch(`/api/User/${localUsername}`);
+                if (res.ok) {
+                    const dbUser = await res.json();
+
+                    document.getElementById('userFullName').innerText = dbUser.fullName;
+                    document.getElementById('userAvatar').innerText = dbUser.fullName.charAt(0).toUpperCase();
+                    document.getElementById('userId').innerText = dbUser.username;
+                    document.getElementById('userPhone').innerText = dbUser.phone || 'Chưa cập nhật';
+                    document.getElementById('userEmail').innerText = dbUser.email || 'Chưa cập nhật';
+
+                    let roleDisplay = 'Thành viên Web';
+                    if (dbUser.role === 'Admin') roleDisplay = 'Quản trị viên Hệ thống';
+                    if (dbUser.role === 'Sales') roleDisplay = 'Nhân viên Kinh doanh';
+                    document.getElementById('userRoleTitle').innerText = roleDisplay;
+
+                } else {
+                    document.getElementById('userFullName').innerText = "Lỗi tải Profile";
+                }
+            } catch (err) {
+                console.error("Lỗi MongoDB:", err);
+            }
+        }
+
+
+        async function loadUserHistory() {
+            try {
+                const [propRes, appRes, transRes] = await Promise.all([
+                    fetch('/api/BatDongSan'), fetch('/api/Appointment'), fetch('/api/Transaction')
+                ]);
+
+                const properties = await propRes.json();
+                const allApps = await appRes.json();
+                const allTrans = await transRes.json();
+
+                const myApps = allApps.filter(a => a.customerId === localUsername || a.userId === localUsername);
+                const myTrans = allTrans.filter(t => t.customerId === localUsername);
+
+
+                let appHtml = '';
+                if (myApps.length === 0) appHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa đặt lịch hẹn xem nhà nào.</p>';
+                else {
+                    myApps.forEach(a => {
+                        const prop = properties.find(p => p.id === a.propertyId);
+                        const date = new Date(a.appointmentDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+                        let stClass = "st-warning";
+                        if (a.status.includes("xem")) stClass = "st-success";
+                        if (a.status.includes("hủy") || a.status.includes("Cancel")) stClass = "st-danger";
+
+                        appHtml += `<div class="history-item">
+                                            <div><div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div><div class="item-date"><i class="far fa-clock"></i> Thời gian hẹn: <strong>${date}</strong></div></div>
+                                            <div><span class="status-badge ${stClass}">${a.status}</span></div>
+                                        </div>`;
+                    });
+                }
+                document.getElementById('appointment-list').innerHTML = appHtml;
+
+
+                let transHtml = '';
+                if (myTrans.length === 0) transHtml = '<p style="text-align:center; padding: 20px; color:#888;">Bạn chưa có giao dịch bất động sản nào.</p>';
+                else {
+                    myTrans.forEach(t => {
+                        const prop = properties.find(p => p.id === t.propertyId);
+                        let stClass = "st-warning";
+                        if (t.status === "Hoàn tất" || t.status === "Completed") stClass = "st-success";
+                        if (t.status === "Đã hủy" || t.status === "Cancelled") stClass = "st-danger";
+
+                        transHtml += `<div class="history-item" style="border-left-color: var(--success);">
+                                            <div><div class="item-title">${prop ? prop.tieuDe : 'Bất động sản đã bị ẩn'}</div><div class="item-date">Loại hợp đồng: <strong>${t.type}</strong> - Giá trị: <strong style="color:var(--accent); font-size:15px;">${t.price.toLocaleString('vi-VN')} đ</strong></div></div>
+                                            <div><span class="status-badge ${stClass}">${t.status}</span></div>
+                                        </div>`;
+                    });
+                }
+                document.getElementById('transaction-list').innerHTML = transHtml;
+
+            } catch (error) {
+                document.getElementById('appointment-list').innerHTML = '<p style="color:red; text-align:center;">Lỗi kết nối cơ sở dữ liệu.</p>';
+                document.getElementById('transaction-list').innerHTML = '<p style="color:red; text-align:center;">Lỗi kết nối cơ sở dữ liệu.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

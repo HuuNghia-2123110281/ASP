@@ -11,8 +11,8 @@
             --accent: #e91e63;
             --dark: #202124;
             --gray: #5f6368;
-            --success: #00a652; /* Màu xanh lá chuẩn của batdongsan.vn */
-            --bg-search: #2c2c2c; /* Màu nền xám đen của khung search */
+            --success: #00a652;
+            --bg-search: #2c2c2c;
         }
 
         body {
@@ -118,6 +118,27 @@
                 padding-left: 26px !important;
             }
 
+        /* USER DROPDOWN MỚI */
+        .user-dropdown-content {
+            min-width: 180px;
+            right: 0;
+            left: auto;
+            top: 100%;
+            margin-top: 5px;
+            border-radius: 8px;
+        }
+
+            .user-dropdown-content a {
+                font-size: 14px !important;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+                .user-dropdown-content a:hover {
+                    padding-left: 20px !important;
+                }
+
         .auth-box {
             display: flex;
             align-items: center;
@@ -157,9 +178,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding-right: 15px;
-            border-right: 1px solid #555;
+            cursor: pointer;
+            transition: 0.3s;
         }
+
+            .user-greeting:hover {
+                color: #4da3ff;
+            }
 
         .hero {
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1350&q=80') center/cover;
@@ -177,7 +202,6 @@
                 margin-bottom: 30px;
             }
 
-        /* --- REDESIGN KHUNG TÌM KIẾM CHUẨN BATDONGSAN.VN --- */
         .search-wrapper {
             background: rgba(0, 0, 0, 0.6);
             padding: 20px;
@@ -187,7 +211,6 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Dòng 1: Radio Buttons */
         .search-tabs {
             display: flex;
             gap: 30px;
@@ -213,7 +236,7 @@
             .search-tabs input[type="radio"] {
                 display: none;
             }
-        /* Custom Radio Circle */
+
         .radio-circle {
             width: 16px;
             height: 16px;
@@ -245,7 +268,6 @@
             opacity: 1;
         }
 
-        /* Dòng 2: Thanh tìm kiếm chính */
         .search-main-row {
             display: flex;
             background: var(--bg-search);
@@ -301,7 +323,6 @@
                 background: #008a44;
             }
 
-        /* Dòng 3: Các nút Filter (Pills) */
         .search-filters-row {
             display: flex;
             gap: 10px;
@@ -354,7 +375,6 @@
             .btn-reset:hover {
                 background: rgba(255,255,255,0.1);
             }
-        /* ---------------------------------------------------- */
 
         .container {
             display: grid;
@@ -458,6 +478,7 @@
             <a onclick="loadProjectsUI()">Dự án</a>
             <a onclick="loadNewsUI()">Tin tức</a>
         </nav>
+
         <div class="auth-box" id="auth-section">
             <a href="login.html" class="btn-header btn-outline"><i class="fas fa-user-circle"></i> Đăng nhập</a>
         </div>
@@ -494,8 +515,7 @@
 
             <div class="search-filters-row">
                 <select class="filter-pill"><option>Toàn quốc</option></select>
-                <select id="searchPrice" class="filter-pill">
-                </select>
+                <select id="searchPrice" class="filter-pill"></select>
                 <select class="filter-pill"><option>Diện tích</option></select>
                 <select class="filter-pill"><option>Tuỳ chọn thêm</option></select>
                 <button class="btn-reset" onclick="resetFilters()" title="Đặt lại"><i class="fas fa-sync-alt"></i></button>
@@ -503,7 +523,7 @@
         </div>
     </section>
 
-    <h2 class="section-title" id="main-title">Bất động sản Dành cho bạn</h2>
+    <h2 class="section-title" id="main-title">Bất động sản Mới nhất</h2>
 
     <div id="list-bds" class="container">
         <p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu từ máy chủ...</p>
@@ -518,14 +538,30 @@
             const authSection = document.getElementById("auth-section");
 
             if (fullName) {
-                let menuHTML = `<div class="user-greeting"><i class="fas fa-user-circle" style="font-size: 20px; color: #4da3ff;"></i> ${fullName}</div>`;
-                if (role === "Admin") menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-admin" style="border:none;"><i class="fas fa-user-shield"></i> Trang Quản Trị</a>`;
-                else if (role === "Sales") menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-post"><i class="fas fa-edit"></i> Sales Panel</a>`;
-                menuHTML += `<a href="#" onclick="logout()" style="color: #bbb; text-decoration: none; margin-left: 10px;"><i class="fas fa-sign-out-alt"></i></a>`;
+                let menuHTML = ``;
+
+                if (role === "Admin") {
+                    menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-admin" style="border:none;"><i class="fas fa-user-shield"></i> Trang Quản Trị</a>`;
+                } else if (role === "Sales") {
+                    menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-post"><i class="fas fa-edit"></i> Sales Panel</a>`;
+                }
+
+                menuHTML += `
+                    <div class="dropdown" style="margin-left: 15px;">
+                        <div class="user-greeting">
+                            <i class="fas fa-user-circle" style="font-size: 22px; color: #4da3ff;"></i>
+                            ${fullName} <i class="fas fa-angle-down" style="font-size: 12px; margin-left: 2px;"></i>
+                        </div>
+                        <div class="dropdown-content user-dropdown-content">
+                            <a href="profile.html"><i class="fas fa-id-badge" style="width:20px; color:var(--primary);"></i> Hồ sơ cá nhân</a>
+                            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt" style="width:20px; color:var(--danger);"></i> Đăng xuất</a>
+                        </div>
+                    </div>`;
+
                 authSection.innerHTML = menuHTML;
             }
 
-            updatePriceFilter(); // Load option giá lần đầu
+            updatePriceFilter();
             loadData();
 
             document.getElementById("searchKeyword").addEventListener("keypress", function (e) {
@@ -540,21 +576,9 @@
             const isRent = document.querySelector('input[name="transType"]:checked').value === 'thue';
             const priceSelect = document.getElementById('searchPrice');
             if (isRent) {
-                priceSelect.innerHTML = `
-                        <option value="">Mức giá (Thuê)</option>
-                        <option value="0-5000000">Dưới 5 triệu</option>
-                        <option value="5000000-10000000">5 - 10 triệu</option>
-                        <option value="10000000-20000000">10 - 20 triệu</option>
-                        <option value="20000000-99999999999">Trên 20 triệu</option>
-                    `;
+                priceSelect.innerHTML = `<option value="">Mức giá (Thuê)</option><option value="0-5000000">Dưới 5 triệu</option><option value="5000000-10000000">5 - 10 triệu</option><option value="10000000-20000000">10 - 20 triệu</option><option value="20000000-99999999999">Trên 20 triệu</option>`;
             } else {
-                priceSelect.innerHTML = `
-                        <option value="">Mức giá (Bán)</option>
-                        <option value="0-2000000000">Dưới 2 Tỷ</option>
-                        <option value="2000000000-5000000000">2 Tỷ - 5 Tỷ</option>
-                        <option value="5000000000-10000000000">5 Tỷ - 10 Tỷ</option>
-                        <option value="10000000000-999999999999">Trên 10 Tỷ</option>
-                    `;
+                priceSelect.innerHTML = `<option value="">Mức giá (Bán)</option><option value="0-2000000000">Dưới 2 Tỷ</option><option value="2000000000-5000000000">2 Tỷ - 5 Tỷ</option><option value="5000000000-10000000000">5 Tỷ - 10 Tỷ</option><option value="10000000000-999999999999">Trên 10 Tỷ</option>`;
             }
         }
 
@@ -627,7 +651,6 @@
             document.getElementById('list-bds').innerHTML = html;
         }
 
-        // --- GỌI API THẬT CHO DỰ ÁN & TIN TỨC ---
         function loadProjectsUI() {
             document.getElementById("main-title").innerText = "Dự án Bất động sản Nổi bật";
             fetch('/api/Project').then(res => res.json()).then(data => {
@@ -648,8 +671,6 @@
         function loadNewsUI() {
             document.getElementById("main-title").innerText = "Tin tức Thị trường";
             document.getElementById('list-bds').innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tải bài viết...</p>';
-
-            // GỌI API TIN TỨC THẬT TỪ MONGODB
             fetch('/api/News').then(res => res.json()).then(data => {
                 let html = '';
                 if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center;">Chưa có bài viết nào được đăng.</p>';
@@ -667,8 +688,6 @@
                 });
                 document.getElementById('list-bds').innerHTML = html;
                 document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
-            }).catch(e => {
-                document.getElementById('list-bds').innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:red;">Bạn cần thêm NewsController.cs vào Backend để tính năng này hoạt động!</p>';
             });
         }
     </script>

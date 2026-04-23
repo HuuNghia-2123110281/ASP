@@ -17,7 +17,7 @@ namespace asp.Controllers
             _userCollection = database.GetCollection<User>("Users");
         }
 
-        // Lấy danh sách toàn bộ nhân viên (Dành cho Admin)
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAllUsers()
         {
@@ -27,7 +27,27 @@ namespace asp.Controllers
             return Ok(users);
         }
 
-        // Xóa nhân viên
+
+        [HttpGet("{username}")]
+        public async Task<IActionResult> GetProfile(string username)
+        {
+            var user = await _userCollection.Find(u => u.Username == username).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound(new { message = "Không tìm thấy thông tin người dùng!" });
+            }
+
+            return Ok(new
+            {
+                username = user.Username,
+                fullName = user.FullName ?? user.Username,
+                email = user.Email,
+                phone = user.Phone,
+                role = user.Role
+            });
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
