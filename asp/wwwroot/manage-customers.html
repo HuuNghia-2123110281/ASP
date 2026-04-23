@@ -25,15 +25,12 @@
             overflow: hidden;
         }
 
-        /* 1. THANH SIDEBAR BÊN TRÁI (Chuẩn SB Admin 2) */
         .sidebar {
             width: 250px;
             background-image: linear-gradient(180deg, var(--primary) 10%, var(--primary-dark) 100%);
-            background-size: cover;
             color: white;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s;
             z-index: 100;
         }
 
@@ -46,15 +43,8 @@
             font-weight: 900;
             color: white;
             text-decoration: none;
-            letter-spacing: 2px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
         }
-
-            .sidebar-brand i {
-                transform: rotate(-15deg);
-                margin-right: 10px;
-                font-size: 24px;
-            }
 
         .nav-menu {
             flex: 1;
@@ -63,17 +53,16 @@
         }
 
         .nav-heading {
-            padding: 15px 20px 5px 20px;
+            padding: 15px 20px 5px;
             font-size: 11px;
             font-weight: 800;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.4);
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .nav-item {
             padding: 12px 20px;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255,255,255,0.8);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -83,22 +72,12 @@
             transition: 0.2s;
         }
 
-            .nav-item i {
-                width: 20px;
-                text-align: center;
-                font-size: 16px;
-            }
-
             .nav-item:hover, .nav-item.active {
                 color: white;
             }
 
-                .nav-item.active i {
-                    color: white;
-                }
-
         .divider {
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255,255,255,0.15);
             margin: 10px 20px;
         }
 
@@ -218,7 +197,6 @@
             font-weight: bold;
         }
 
-
         .modal-overlay {
             display: none;
             position: fixed;
@@ -239,7 +217,6 @@
             width: 700px;
             max-height: 85vh;
             overflow-y: auto;
-            position: relative;
         }
 
         .profile-header {
@@ -301,7 +278,6 @@
                 color: white;
             }
 
-
         .sub-modal-overlay {
             display: none;
             position: fixed;
@@ -335,23 +311,20 @@
         <a href="admin-dashboard.html" class="sidebar-brand">
             <i class="fas fa-laugh-wink"></i> BĐS NGHĨA
         </a>
-
         <div class="nav-menu">
             <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
-
             <div class="divider"></div>
             <div class="nav-heading">Quản trị Nguồn hàng</div>
             <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
             <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
-
             <div class="divider"></div>
             <div class="nav-heading">Nghiệp vụ Sales</div>
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
             <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
-            <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Nhân viên sales</a>
-            <a href="manage-news.html" class="nav-item active"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
+            <a href="manage-customers.html" class="nav-item active"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
+            <a href="manage-employees.html" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
+            <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
 
@@ -366,6 +339,7 @@
 
         <div class="container-fluid">
             <h1 class="page-title">Hồ sơ Khách hàng</h1>
+
             <div class="add-box">
                 <input type="text" id="cusName" placeholder="Họ và tên (*)">
                 <input type="text" id="cusPhone" placeholder="Số điện thoại (*)">
@@ -376,8 +350,17 @@
 
             <div class="table-box">
                 <table>
-                    <thead><tr><th>Họ và Tên</th><th>Số điện thoại / Email</th><th>Nhu cầu ban đầu</th><th>Thao tác</th></tr></thead>
-                    <tbody id="customer-list"><tr><td colspan="4">Đang tải...</td></tr></tbody>
+                    <thead>
+                        <tr>
+                            <th>Họ và Tên</th>
+                            <th>Số điện thoại / Email</th>
+                            <th>Nhu cầu ban đầu</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-list">
+                        <tr><td colspan="4" style="text-align: center;">Đang tải...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -421,36 +404,63 @@
         document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("adminName").innerText = localStorage.getItem("username") || "Admin";
 
-
-            const [resP, resA, resT] = await Promise.all([fetch('/api/BatDongSan'), fetch('/api/Appointment'), fetch('/api/Transaction')]);
-            properties = await resP.json();
-            allApps = await resA.json();
-            allTrans = await resT.json();
+            try {
+                const [resP, resA, resT] = await Promise.all([
+                    fetch('/api/BatDongSan'),
+                    fetch('/api/Appointment'),
+                    fetch('/api/Transaction')
+                ]);
+                properties = await resP.json();
+                allApps = await resA.json();
+                allTrans = await resT.json();
+            } catch (e) {
+                console.error("Lỗi tải dữ liệu phụ:", e);
+            }
 
             loadCustomers();
         });
 
+        // 1. Tải danh sách Khách hàng từ bảng User
         function loadCustomers() {
-            fetch('/api/Customer').then(res => res.json()).then(data => {
-                customers = data; let html = '';
-                if (data.length === 0) html = '<tr><td colspan="4" style="text-align:center;">Chưa có khách</td></tr>';
-                data.forEach(c => {
-                    html += `<tr>
-                                <td><strong style="color:var(--primary); font-size:16px;">${c.name}</strong></td>
-                                <td>${c.phone}<br><small style="color:#858796">${c.email || 'Chưa cập nhật email'}</small></td>
-                                <td>${c.demand || 'Không rõ'}</td>
-                                <td><button class="action-btn" onclick="viewDetail('${c.id}')"><i class="fas fa-id-card"></i> Mở Hồ Sơ</button></td>
-                            </tr>`;
+            fetch('/api/User')
+                .then(res => res.json())
+                .then(data => {
+                    customers = data.filter(u => u.role === 'KhachHang' || !u.role);
+
+                    let html = '';
+                    if (customers.length === 0) html = '<tr><td colspan="4" style="text-align:center;">Chưa có khách</td></tr>';
+
+                    customers.forEach(c => {
+                        const displayName = c.fullName || c.username;
+                        html += `<tr>
+                                        <td><strong style="color:var(--primary); font-size:16px;">${displayName}</strong><br><small style="color:#858796">ID: ${c.username}</small></td>
+                                        <td>${c.phone || '<span style="color:var(--danger)">Chưa có SĐT</span>'}<br><small style="color:#858796">${c.email || 'Chưa cập nhật email'}</small></td>
+                                        <td>Khách hàng Website</td>
+                                        <td><button class="action-btn" onclick="viewDetail('${c.username}')"><i class="fas fa-id-card"></i> Mở Hồ Sơ</button></td>
+                                    </tr>`;
+                    });
+                    document.getElementById('customer-list').innerHTML = html;
+                })
+                .catch(err => {
+                    document.getElementById('customer-list').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Lỗi tải dữ liệu</td></tr>';
                 });
-                document.getElementById('customer-list').innerHTML = html;
-            });
         }
 
+        // 2. Hàm tạo Mật khẩu ngẫu nhiên
+        function generateRandomPassword() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let password = "";
+            for (let i = 0; i < 6; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // 3. Thêm mới Khách hàng
         async function addCustomer() {
             const name = document.getElementById('cusName').value.trim();
             const phone = document.getElementById('cusPhone').value.trim();
-            const email = document.getElementById('cusEmail').value.trim();
-            const demand = document.getElementById('cusDemand').value.trim();
+            const email = document.getElementById('cusEmail') ? document.getElementById('cusEmail').value.trim() : "";
 
             if (!name || !phone) {
                 alert("Vui lòng nhập đầy đủ Họ tên và Số điện thoại!");
@@ -463,11 +473,14 @@
                 return;
             }
 
+            const randomPassword = generateRandomPassword();
+
             const data = {
                 username: phone,
+                password: randomPassword,
                 fullName: name,
                 phone: phone,
-                email: email || "",
+                email: email,
                 role: "KhachHang"
             };
 
@@ -479,14 +492,12 @@
                 });
 
                 if (response.ok) {
-                    alert("Đã thêm khách hàng và lưu vào MongoDB thành công!");
-
+                    alert(`Đã thêm khách hàng thành công!\n\n📋 THÔNG TIN TÀI KHOẢN CỦA KHÁCH:\n- Tài khoản (SĐT): ${phone}\n- Mật khẩu tạm thời: ${randomPassword}\n\n(Vui lòng copy và gửi thông tin này cho khách hàng)`);
 
                     document.getElementById('cusName').value = '';
                     document.getElementById('cusPhone').value = '';
-                    document.getElementById('cusEmail').value = '';
-                    document.getElementById('cusDemand').value = '';
-
+                    if (document.getElementById('cusEmail')) document.getElementById('cusEmail').value = '';
+                    if (document.getElementById('cusDemand')) document.getElementById('cusDemand').value = '';
 
                     loadCustomers();
                 } else {
@@ -499,79 +510,41 @@
             }
         }
 
-            const customerData = {
-                username: phone,
-                password: "123",
-                fullName: name,
-                phone: phone,
-                email: email,
-                role: "KhachHang",
-                demand: demand,
-                createdAt: new Date().toISOString()
-            };
+        function viewDetail(username) {
+            const cus = customers.find(c => c.username === username);
+            const displayName = cus.fullName || cus.username;
 
-            try {
-                const response = await fetch('/api/Auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(customerData)
-                });
-
-                if (response.ok) {
-                    alert("Đã lưu khách hàng mới vào MongoDB thành công!");
-
-                    document.getElementById('cusName').value = '';
-                    document.getElementById('cusPhone').value = '';
-                    if (document.getElementById('cusEmail')) document.getElementById('cusEmail').value = '';
-
-                    loadCustomers();
-                } else {
-                    const errorData = await response.json();
-                    alert("Lỗi: " + (errorData.message || "Không thể lưu khách hàng"));
-                }
-            } catch (error) {
-                console.error("Lỗi kết nối API:", error);
-                alert("Không thể kết nối đến máy chủ!");
-            }
-
-        function viewDetail(id) {
-            const cus = customers.find(c => c.id === id);
-            document.getElementById('modalAvt').innerText = cus.name.charAt(0).toUpperCase();
-            document.getElementById('modalName').innerText = cus.name;
-            document.getElementById('modalPhone').innerText = cus.phone;
+            document.getElementById('modalAvt').innerText = displayName.charAt(0).toUpperCase();
+            document.getElementById('modalName').innerText = displayName;
+            document.getElementById('modalPhone').innerText = cus.phone || 'Chưa có SĐT';
             document.getElementById('modalEmail').innerText = cus.email || 'Chưa có email';
 
-            const cusApps = allApps.filter(a => a.customerId === id);
-            const cusTrans = allTrans.filter(t => t.customerId === id);
-
+            const cusApps = allApps.filter(a => a.customerId === username);
+            const cusTrans = allTrans.filter(t => t.customerId === username);
 
             let interestHtml = '';
             cusApps.forEach(a => {
                 const prop = properties.find(p => p.id === a.propertyId);
                 const d = new Date(a.appointmentDate).toLocaleDateString('vi-VN');
                 interestHtml += `<div class="history-item">
-                            <div>Ngày hẹn: <b>${d}</b> - <span style="color:var(--primary)">${prop ? prop.tieuDe : 'BĐS đã xóa'}</span></div>
-                            <button class="btn-sub-detail" onclick="showAppDetail('${a.id}')">Chi tiết</button>
-                        </div>`;
+                                        <div>Ngày hẹn: <b>${d}</b> - <span style="color:var(--primary)">${prop ? prop.tieuDe : 'BĐS đã xóa'}</span></div>
+                                        <button class="btn-sub-detail" onclick="showAppDetail('${a.id}')">Chi tiết</button>
+                                    </div>`;
             });
             document.getElementById('modalInterestList').innerHTML = interestHtml || '<div class="history-item">Chưa có lịch hẹn xem nhà.</div>';
-
 
             let transHtml = '';
             cusTrans.forEach(t => {
                 const prop = properties.find(p => p.id === t.propertyId);
                 transHtml += `<div class="history-item">
-                            <div>Loại: <b>${t.type}</b> - Giá: <strong style="color:var(--danger)">${t.price.toLocaleString('vi-VN')} đ</strong></div>
-                            <button class="btn-sub-detail" style="color:var(--success); border-color:var(--success);" onclick="showTransDetail('${t.id}')">Chi tiết</button>
-                        </div>`;
+                                        <div>Loại: <b>${t.type}</b> - Giá: <strong style="color:var(--danger)">${t.price.toLocaleString('vi-VN')} đ</strong></div>
+                                        <button class="btn-sub-detail" style="color:var(--success); border-color:var(--success);" onclick="showTransDetail('${t.id}')">Chi tiết</button>
+                                    </div>`;
             });
             document.getElementById('modalTransList').innerHTML = transHtml || '<div class="history-item">Chưa có giao dịch.</div>';
 
             document.getElementById('detailModal').style.display = 'flex';
         }
-
 
         function showAppDetail(appId) {
             const a = allApps.find(x => x.id === appId);
@@ -579,11 +552,11 @@
             const d = new Date(a.appointmentDate).toLocaleString('vi-VN');
             document.getElementById('subTitle').innerHTML = '<i class="fas fa-calendar"></i> Chi tiết Lịch Hẹn';
             document.getElementById('subBody').innerHTML = `
-                        <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
-                        <p><strong>Thời gian:</strong> ${d}</p>
-                        <p><strong>Trạng thái:</strong> <span style="background:#f6c23e; padding:3px 8px; border-radius:4px; font-weight:bold;">${a.status}</span></p>
-                        <p><strong>Sales phụ trách (ID):</strong> ${a.userId || 'Chưa phân công'}</p>
-                    `;
+                            <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
+                            <p><strong>Thời gian:</strong> ${d}</p>
+                            <p><strong>Trạng thái:</strong> <span style="background:#f6c23e; padding:3px 8px; border-radius:4px; font-weight:bold; color:#333;">${a.status}</span></p>
+                            <p><strong>Sales phụ trách:</strong> ${a.userId || 'Chưa phân công'}</p>
+                        `;
             document.getElementById('subDetailModal').style.display = 'flex';
         }
 
@@ -592,12 +565,12 @@
             const p = properties.find(x => x.id === t.propertyId);
             document.getElementById('subTitle').innerHTML = '<i class="fas fa-handshake" style="color:var(--success);"></i> Chi tiết Giao Dịch';
             document.getElementById('subBody').innerHTML = `
-                        <p><strong>Mã GD:</strong> #${t.id}</p>
-                        <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
-                        <p><strong>Loại hợp đồng:</strong> ${t.type}</p>
-                        <p><strong>Giá trị chốt:</strong> <span style="color:var(--danger); font-weight:bold; font-size:18px;">${t.price.toLocaleString('vi-VN')} đ</span></p>
-                        <p><strong>Trạng thái:</strong> ${t.status}</p>
-                    `;
+                            <p><strong>Mã GD:</strong> #${t.id.substring(0, 8).toUpperCase()}</p>
+                            <p><strong>Bất động sản:</strong> ${p ? p.tieuDe : 'Không rõ'}</p>
+                            <p><strong>Loại hợp đồng:</strong> ${t.type}</p>
+                            <p><strong>Giá trị chốt:</strong> <span style="color:var(--danger); font-weight:bold; font-size:18px;">${t.price.toLocaleString('vi-VN')} đ</span></p>
+                            <p><strong>Trạng thái:</strong> ${t.status}</p>
+                        `;
             document.getElementById('subDetailModal').style.display = 'flex';
         }
     </script>
