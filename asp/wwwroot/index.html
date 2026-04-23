@@ -11,8 +11,8 @@
             --accent: #e91e63;
             --dark: #202124;
             --gray: #5f6368;
-            --light: #f8f9fa;
-            --success: #00a652;
+            --success: #00a652; /* Màu xanh lá chuẩn của batdongsan.vn */
+            --bg-search: #2c2c2c; /* Màu nền xám đen của khung search */
         }
 
         body {
@@ -23,22 +23,21 @@
         }
 
         header {
-            background: white;
+            background: var(--dark);
             padding: 15px 4%;
             display: flex;
-            flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 1px solid #333;
         }
 
         .logo {
             font-size: 28px;
             font-weight: 800;
-            color: var(--primary);
+            color: #4da3ff;
             text-decoration: none;
             text-transform: uppercase;
             display: flex;
@@ -54,39 +53,20 @@
 
             .nav-links > a, .dropdown > a {
                 text-decoration: none;
-                color: var(--dark);
+                color: #fff;
                 font-weight: 600;
-                font-size: 16px;
+                font-size: 15px;
                 padding: 10px 0;
                 position: relative;
                 transition: color 0.3s;
                 cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 5px;
             }
 
                 .nav-links > a:hover, .dropdown:hover > a {
-                    color: var(--primary);
+                    color: #4da3ff;
                 }
 
-                .nav-links > a::after {
-                    content: '';
-                    position: absolute;
-                    width: 0;
-                    height: 3px;
-                    bottom: 0;
-                    left: 0;
-                    background-color: var(--primary);
-                    transition: width 0.3s ease-in-out;
-                    border-radius: 2px;
-                }
-
-                .nav-links > a:hover::after {
-                    width: 100%;
-                }
-
-        /* --- CSS DROPDOWN MENU CHUẨN BATDONGSAN.VN --- */
+        /* Dropdown Menu */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -101,15 +81,13 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             z-index: 1000;
             top: 100%;
-            left: -10px;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #eee;
         }
 
         .dropdown:hover .dropdown-content {
             display: block;
-            animation: fadeIn 0.2s ease-in-out;
+            animation: fadeIn 0.2s;
         }
 
         @keyframes fadeIn {
@@ -130,7 +108,6 @@
             text-decoration: none;
             display: block;
             font-weight: 500 !important;
-            font-size: 15px !important;
             border-bottom: 1px solid #f5f5f5;
             transition: 0.2s;
         }
@@ -141,11 +118,6 @@
                 padding-left: 26px !important;
             }
 
-            .dropdown-content a::after {
-                display: none;
-            }
-        /* Tắt gạch chân cho menu con */
-
         .auth-box {
             display: flex;
             align-items: center;
@@ -153,127 +125,236 @@
         }
 
         .btn-header {
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 1px solid transparent;
+            border: 1px solid #666;
+            color: white;
         }
 
-        .btn-outline {
-            border-color: var(--gray);
-            color: var(--dark);
-            background: transparent;
-        }
-
-            .btn-outline:hover {
-                border-color: var(--primary);
-                color: var(--primary);
-                background: #f0f4f8;
+            .btn-header:hover {
+                border-color: #fff;
             }
 
         .btn-post {
             background: var(--success);
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 166, 82, 0.2);
+            border-color: var(--success);
         }
 
             .btn-post:hover {
                 background: #008a44;
-                transform: translateY(-2px);
-            }
-
-        .btn-admin {
-            background: var(--dark);
-            color: white;
-        }
-
-            .btn-admin:hover {
-                background: #000;
-                transform: translateY(-2px);
+                border-color: #008a44;
             }
 
         .user-greeting {
             font-weight: 600;
-            color: var(--dark);
+            color: white;
             display: flex;
             align-items: center;
             gap: 8px;
             padding-right: 15px;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid #555;
         }
 
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 450px;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1350&q=80') center/cover;
+            height: 500px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            text-align: center;
         }
 
             .hero h1 {
                 font-size: 42px;
+                color: white;
                 text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+                margin-bottom: 30px;
             }
 
-        .search-container {
-            background: white;
-            padding: 15px;
-            border-radius: 50px;
-            display: flex;
+        /* --- REDESIGN KHUNG TÌM KIẾM CHUẨN BATDONGSAN.VN --- */
+        .search-wrapper {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
             width: 90%;
-            max-width: 800px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            margin-top: 20px;
+            max-width: 900px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Dòng 1: Radio Buttons */
+        .search-tabs {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 15px;
+            padding-left: 5px;
+        }
+
+            .search-tabs label {
+                color: white;
+                font-size: 15px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                opacity: 0.8;
+                transition: 0.3s;
+            }
+
+                .search-tabs label:hover {
+                    opacity: 1;
+                }
+
+            .search-tabs input[type="radio"] {
+                display: none;
+            }
+        /* Custom Radio Circle */
+        .radio-circle {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+        }
+
+        .search-tabs input[type="radio"]:checked + .radio-circle {
+            border-color: var(--success);
+        }
+
+            .search-tabs input[type="radio"]:checked + .radio-circle::after {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: var(--success);
+                border-radius: 50%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+        .search-tabs input[type="radio"]:checked ~ span {
+            color: white;
+            font-weight: bold;
+            opacity: 1;
+        }
+
+        /* Dòng 2: Thanh tìm kiếm chính */
+        .search-main-row {
+            display: flex;
+            background: var(--bg-search);
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+
+            .search-main-row select {
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 15px;
+                padding: 12px 15px;
+                outline: none;
+                border-right: 1px solid #444;
+                cursor: pointer;
+                width: 180px;
+            }
+
+                .search-main-row select option {
+                    background: white;
+                    color: black;
+                }
+
+            .search-main-row input {
+                flex: 1;
+                background: transparent;
+                border: none;
+                color: white;
+                padding: 12px 20px;
+                font-size: 15px;
+                outline: none;
+            }
+
+                .search-main-row input::placeholder {
+                    color: #aaa;
+                }
+
+        .btn-search-main {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 30px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+            .btn-search-main:hover {
+                background: #008a44;
+            }
+
+        /* Dòng 3: Các nút Filter (Pills) */
+        .search-filters-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pill {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 10px auto;
+        }
+
+            .filter-pill:hover {
+                border-color: #888;
+                background-color: rgba(255,255,255,0.1);
+            }
+
+            .filter-pill option {
+                background: white;
+                color: black;
+            }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
             align-items: center;
         }
 
-            .search-container input {
-                flex: 2;
-                border: none;
-                padding: 10px 20px;
-                outline: none;
-                font-size: 16px;
+            .btn-reset:hover {
+                background: rgba(255,255,255,0.1);
             }
-
-            .search-container select {
-                flex: 1;
-                border: none;
-                outline: none;
-                border-left: 1px solid #ddd;
-                padding-left: 15px;
-                font-size: 15px;
-                color: #555;
-                cursor: pointer;
-            }
-
-        .search-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            margin-left: 5px;
-            transition: 0.3s;
-        }
-
-            .search-btn:hover {
-                background: #1557b0;
-            }
+        /* ---------------------------------------------------- */
 
         .container {
             display: grid;
@@ -295,28 +376,24 @@
 
         .card {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: 0.4s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
             cursor: pointer;
-            position: relative;
             border: 1px solid #eee;
         }
 
             .card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             }
-
-        .card-img-wrapper {
-            position: relative;
-        }
 
         .card-img {
             width: 100%;
             height: 230px;
             object-fit: cover;
+            position: relative;
         }
 
         .price-tag {
@@ -325,44 +402,21 @@
             left: 15px;
             background: var(--accent);
             color: white;
-            padding: 7px 15px;
-            border-radius: 8px;
+            padding: 5px 12px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
         }
-
-        .wishlist-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--gray);
-            transition: 0.3s;
-            z-index: 10;
-        }
-
-            .wishlist-btn:hover {
-                transform: scale(1.2);
-                color: var(--accent);
-            }
 
         .card-content {
-            padding: 25px;
+            padding: 20px;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             color: var(--gray);
-            font-size: 0.9em;
+            font-size: 13px;
             border-top: 1px solid #eee;
             padding-top: 15px;
             margin-top: 15px;
@@ -371,21 +425,21 @@
         footer {
             background: var(--dark);
             color: white;
-            padding: 50px 5%;
+            padding: 30px 5%;
             text-align: center;
             margin-top: 60px;
+            border-top: 3px solid var(--primary);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo"><i class="fas fa-city"></i> BĐS NGHĨA</a>
+        <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA</a>
         <nav class="nav-links">
             <a href="index.html">Trang chủ</a>
-
             <div class="dropdown">
-                <a>Nhà đất bán <i class="fas fa-angle-down" style="font-size: 12px;"></i></a>
+                <a>Nhà đất bán <i class="fas fa-angle-down"></i></a>
                 <div class="dropdown-content">
                     <a onclick="filterMenu('Căn hộ', 'ban')">Bán căn hộ chung cư</a>
                     <a onclick="filterMenu('Nhà phố', 'ban')">Bán nhà riêng, nhà phố</a>
@@ -393,16 +447,14 @@
                     <a onclick="filterMenu('Đất nền', 'ban')">Bán đất nền dự án</a>
                 </div>
             </div>
-
             <div class="dropdown">
-                <a>Cho thuê <i class="fas fa-angle-down" style="font-size: 12px;"></i></a>
+                <a>Cho thuê <i class="fas fa-angle-down"></i></a>
                 <div class="dropdown-content">
                     <a onclick="filterMenu('Căn hộ', 'thue')">Cho thuê căn hộ chung cư</a>
                     <a onclick="filterMenu('Nhà phố', 'thue')">Cho thuê nhà riêng, phòng trọ</a>
-                    <a onclick="filterMenu('Tất cả', 'thue')">Cho thuê văn phòng, mặt bằng</a>
+                    <a onclick="filterMenu('Mặt bằng', 'thue')">Cho thuê văn phòng, mặt bằng</a>
                 </div>
             </div>
-
             <a onclick="loadProjectsUI()">Dự án</a>
             <a onclick="loadNewsUI()">Tin tức</a>
         </nav>
@@ -412,27 +464,42 @@
     </header>
 
     <section class="hero">
-        <h1>Khám phá ngôi nhà mơ ước</h1>
-        <div class="search-container">
-            <input type="text" id="searchKeyword" placeholder="Nhập địa điểm, từ khóa...">
+        <h1>Mua bán nhà đất trên toàn quốc</h1>
 
-            <select id="searchType">
-                <option value="Tất cả">Loại nhà đất</option>
-                <option value="Căn hộ">Căn hộ chung cư</option>
-                <option value="Nhà phố">Nhà phố</option>
-                <option value="Biệt thự">Biệt thự</option>
-                <option value="Đất nền">Đất nền</option>
-            </select>
+        <div class="search-wrapper">
+            <div class="search-tabs">
+                <label>
+                    <input type="radio" name="transType" value="ban" checked onchange="updatePriceFilter()">
+                    <span class="radio-circle"></span>
+                    <span>Nhà đất bán</span>
+                </label>
+                <label>
+                    <input type="radio" name="transType" value="thue" onchange="updatePriceFilter()">
+                    <span class="radio-circle"></span>
+                    <span>Nhà cho thuê</span>
+                </label>
+            </div>
 
-            <select id="searchPrice">
-                <option value="">Mức giá</option>
-                <option value="0-2000000000">Dưới 2 Tỷ</option>
-                <option value="2000000000-5000000000">2 Tỷ - 5 Tỷ</option>
-                <option value="5000000000-10000000000">5 Tỷ - 10 Tỷ</option>
-                <option value="10000000000-999999999999">Trên 10 Tỷ</option>
-            </select>
+            <div class="search-main-row">
+                <select id="searchType">
+                    <option value="Tất cả">Loại nhà đất</option>
+                    <option value="Căn hộ">Căn hộ chung cư</option>
+                    <option value="Nhà phố">Nhà riêng / Nhà phố</option>
+                    <option value="Biệt thự">Biệt thự / Liền kề</option>
+                    <option value="Đất nền">Đất nền dự án</option>
+                </select>
+                <input type="text" id="searchKeyword" placeholder="Nhập thông tin dự án, địa chỉ, từ khóa...">
+                <button class="btn-search-main" onclick="executeAdvancedSearch()"><i class="fas fa-search"></i> Tìm kiếm</button>
+            </div>
 
-            <button class="search-btn" onclick="executeAdvancedSearch()"><i class="fas fa-search"></i> Tìm kiếm</button>
+            <div class="search-filters-row">
+                <select class="filter-pill"><option>Toàn quốc</option></select>
+                <select id="searchPrice" class="filter-pill">
+                </select>
+                <select class="filter-pill"><option>Diện tích</option></select>
+                <select class="filter-pill"><option>Tuỳ chọn thêm</option></select>
+                <button class="btn-reset" onclick="resetFilters()" title="Đặt lại"><i class="fas fa-sync-alt"></i></button>
+            </div>
         </div>
     </section>
 
@@ -442,9 +509,7 @@
         <p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu từ máy chủ...</p>
     </div>
 
-    <footer>
-        <p>© 2026 Nguyễn Hữu Nghĩa - Hệ thống quản lý BĐS chuyên nghiệp</p>
-    </footer>
+    <footer><p>© 2026 BĐS Nghĩa - Nền tảng Proptech Hàng Đầu</p></footer>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -453,120 +518,77 @@
             const authSection = document.getElementById("auth-section");
 
             if (fullName) {
-                let menuHTML = `<div class="user-greeting"><i class="fas fa-user-circle" style="font-size: 22px; color: var(--primary);"></i> ${fullName}</div>`;
-
-                if (role === "Admin") {
-                    menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-admin"><i class="fas fa-user-shield"></i> Trang Quản Trị</a>`;
-                }
-                else if (role === "Sales") {
-                    menuHTML += `
-                            <a href="manage-appointments.html" class="btn-header btn-outline"><i class="fas fa-calendar"></i> Lịch hẹn</a>
-                            <a href="manage-transactions.html" class="btn-header btn-outline"><i class="fas fa-handshake"></i> Giao dịch</a>
-                            <a href="add-property.html" class="btn-header btn-post"><i class="fas fa-edit"></i> Đăng tin</a>
-                        `;
-                }
-                menuHTML += `<a href="#" onclick="logout()" style="color: var(--gray); text-decoration: none; margin-left: 10px; font-weight: bold;"><i class="fas fa-sign-out-alt"></i> Thoát</a>`;
+                let menuHTML = `<div class="user-greeting"><i class="fas fa-user-circle" style="font-size: 20px; color: #4da3ff;"></i> ${fullName}</div>`;
+                if (role === "Admin") menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-admin" style="border:none;"><i class="fas fa-user-shield"></i> Trang Quản Trị</a>`;
+                else if (role === "Sales") menuHTML += `<a href="admin-dashboard.html" class="btn-header btn-post"><i class="fas fa-edit"></i> Sales Panel</a>`;
+                menuHTML += `<a href="#" onclick="logout()" style="color: #bbb; text-decoration: none; margin-left: 10px;"><i class="fas fa-sign-out-alt"></i></a>`;
                 authSection.innerHTML = menuHTML;
             }
 
+            updatePriceFilter(); // Load option giá lần đầu
             loadData();
 
-            document.getElementById("searchKeyword").addEventListener("keypress", function (event) {
-                if (event.key === "Enter") { event.preventDefault(); executeAdvancedSearch(); }
+            document.getElementById("searchKeyword").addEventListener("keypress", function (e) {
+                if (e.key === "Enter") executeAdvancedSearch();
             });
         });
 
-        function logout() { localStorage.removeItem("username"); localStorage.removeItem("role"); window.location.reload(); }
-
+        function logout() { localStorage.clear(); window.location.reload(); }
         function viewDetail(id) { window.location.href = `detail.html?id=${id}`; }
 
-        // --- HÀM XỬ LÝ MENU DROPDOWN MUA BÁN / CHO THUÊ ---
-        function filterMenu(type, transactionMode) {
+        function updatePriceFilter() {
+            const isRent = document.querySelector('input[name="transType"]:checked').value === 'thue';
+            const priceSelect = document.getElementById('searchPrice');
+            if (isRent) {
+                priceSelect.innerHTML = `
+                        <option value="">Mức giá (Thuê)</option>
+                        <option value="0-5000000">Dưới 5 triệu</option>
+                        <option value="5000000-10000000">5 - 10 triệu</option>
+                        <option value="10000000-20000000">10 - 20 triệu</option>
+                        <option value="20000000-99999999999">Trên 20 triệu</option>
+                    `;
+            } else {
+                priceSelect.innerHTML = `
+                        <option value="">Mức giá (Bán)</option>
+                        <option value="0-2000000000">Dưới 2 Tỷ</option>
+                        <option value="2000000000-5000000000">2 Tỷ - 5 Tỷ</option>
+                        <option value="5000000000-10000000000">5 Tỷ - 10 Tỷ</option>
+                        <option value="10000000000-999999999999">Trên 10 Tỷ</option>
+                    `;
+            }
+        }
+
+        function filterMenu(type, mode) {
+            document.querySelector(`input[name="transType"][value="${mode}"]`).checked = true;
+            updatePriceFilter();
             document.getElementById("searchType").value = type;
             document.getElementById("searchKeyword").value = "";
-
-            // Logic ép giá: Thuê thường dưới 2 Tỷ, Mua bán thường trên 2 tỷ
-            if (transactionMode === 'ban') {
-                document.getElementById("searchPrice").value = "2000000000-5000000000"; // Tạm set mốc giá cao cho mua bán
-                document.getElementById("main-title").innerText = `Nhà đất bán: ${type}`;
-            } else {
-                document.getElementById("searchPrice").value = "0-2000000000"; // Tạm set mốc giá thấp cho cho thuê
-                document.getElementById("main-title").innerText = `Nhà đất cho thuê: ${type}`;
-            }
-
+            document.getElementById("searchPrice").value = "";
+            document.getElementById("main-title").innerText = mode === 'ban' ? `Nhà đất bán: ${type}` : `Nhà đất cho thuê: ${type}`;
             executeAdvancedSearch();
             document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- HÀM XỬ LÝ MENU DỰ ÁN ---
-        function loadProjectsUI() {
-            document.getElementById("main-title").innerText = "Dự án Bất động sản Nổi bật";
-            document.getElementById('list-bds').innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tải dự án...</p>';
-
-            // Gọi API Dự án thật từ cơ sở dữ liệu
-            fetch('/api/Project')
-                .then(res => res.json())
-                .then(data => {
-                    let html = '';
-                    if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center;">Chưa có dự án nào đang triển khai.</p>';
-                    data.forEach(p => {
-                        html += `
-                            <div class="card" style="padding: 25px; border-top: 5px solid var(--success);">
-                                <div style="background: var(--success); color: white; display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px;">Đang triển khai</div>
-                                <h3 style="color: var(--primary); margin: 0 0 15px 0; font-size: 24px;">${p.name}</h3>
-                                <p style="color: var(--dark); font-size: 15px;"><strong><i class="fas fa-building"></i> Chủ đầu tư:</strong> ${p.investor || 'Đang cập nhật'}</p>
-                                <p style="color: #666; font-size: 15px;"><i class="fas fa-map-marker-alt"></i> ${p.location || 'Khu vực đang cập nhật'}</p>
-                                <button style="width: 100%; margin-top: 15px; padding: 10px; background: white; border: 1px solid var(--primary); color: var(--primary); border-radius: 5px; font-weight: bold; cursor: pointer;">Xem bảng giá</button>
-                            </div>`;
-                    });
-                    document.getElementById('list-bds').innerHTML = html;
-                    document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
-                });
+        function resetFilters() {
+            document.getElementById("searchKeyword").value = "";
+            document.getElementById("searchType").value = "Tất cả";
+            document.getElementById("searchPrice").value = "";
+            loadData();
         }
 
-        // --- HÀM XỬ LÝ MENU TIN TỨC (Dữ liệu tĩnh vì chưa có API News) ---
-        function loadNewsUI() {
-            document.getElementById("main-title").innerText = "Tin tức Thị trường Bất động sản";
-            const news = [
-                { title: "Thị trường BĐS năm 2026: Dấu hiệu phục hồi mạnh mẽ", desc: "Theo các chuyên gia, nguồn cung căn hộ đang tăng trở lại sau chuỗi ngày dài đóng băng...", date: "23/04/2026", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" },
-                { title: "Lãi suất vay mua nhà giảm chạm đáy trong 10 năm", desc: "Cơ hội vàng cho người có nhu cầu ở thực khi các ngân hàng đồng loạt hạ lãi suất vay thế chấp...", date: "22/04/2026", img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80" },
-                { title: "Khu Đông TP.HCM tiếp tục dẫn dắt nguồn cung", desc: "Các dự án hạ tầng giao thông trọng điểm đang làm tăng sức nóng cho khu vực này...", date: "20/04/2026", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80" }
-            ];
-
-            let html = '';
-            news.forEach(n => {
-                html += `
-                    <div class="card" style="display: flex; flex-direction: column;">
-                        <img src="${n.img}" style="width: 100%; height: 200px; object-fit: cover;">
-                        <div style="padding: 20px;">
-                            <small style="color: var(--gray);"><i class="far fa-clock"></i> ${n.date}</small>
-                            <h3 style="margin: 10px 0; color: var(--dark); font-size: 18px;">${n.title}</h3>
-                            <p style="color: #666; font-size: 14px; line-height: 1.5;">${n.desc}</p>
-                            <a href="#" style="color: var(--primary); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 10px;">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </div>`;
-            });
-            document.getElementById('list-bds').innerHTML = html;
-            document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // --- CÁC HÀM XỬ LÝ BĐS CŨ ---
         function loadData() {
-            document.getElementById("main-title").innerText = "Bất động sản Dành cho bạn";
-            fetch('/api/BatDongSan').then(res => res.json()).then(data => renderProperties(data)).catch(err => {
-                document.getElementById('list-bds').innerHTML = `<p style="color:red; text-align:center; grid-column:1/-1;">Lỗi: ${err.message}</p>`;
-            });
+            document.getElementById("main-title").innerText = "Bất động sản Mới nhất";
+            fetch('/api/BatDongSan').then(res => res.json()).then(data => renderProperties(data)).catch(e => console.log(e));
         }
 
         function executeAdvancedSearch() {
             const keyword = document.getElementById("searchKeyword").value.trim();
             const type = document.getElementById("searchType").value;
             const priceRange = document.getElementById("searchPrice").value;
-
             document.getElementById("main-title").innerText = `Kết quả tìm kiếm`;
 
             let minPrice = "", maxPrice = "";
-            if (priceRange) { [minPrice, maxPrice] = priceRange.split('-'); }
+            if (priceRange) [minPrice, maxPrice] = priceRange.split('-');
 
             let url = `/api/BatDongSan/filter?`;
             if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
@@ -575,40 +597,79 @@
             if (maxPrice) url += `maxGia=${maxPrice}`;
 
             document.getElementById('list-bds').innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</p>';
-
-            fetch(url).then(res => res.json()).then(data => renderProperties(data, keyword)).catch(err => {
-                document.getElementById('list-bds').innerHTML = `<p style="color:red; text-align:center; grid-column:1/-1;">Lỗi tìm kiếm: ${err.message}</p>`;
-            });
+            fetch(url).then(res => res.json()).then(data => renderProperties(data, keyword)).catch(e => console.log(e));
         }
 
         function renderProperties(data, keyword = "") {
             let html = '';
-            if (data.length === 0) {
-                html = '<p style="grid-column: 1/-1; text-align:center; padding: 40px; font-size: 18px;">Không tìm thấy dữ liệu phù hợp với bộ lọc.</p>';
-            } else {
+            if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center; padding: 40px; font-size: 16px;">Không tìm thấy nhà đất phù hợp.</p>';
+            else {
                 data.forEach(item => {
-                    const realImg = item.hinhAnhUrl ? item.hinhAnhUrl : `https://loremflickr.com/400/300/house?lock=${item.id}`;
+                    const realImg = item.hinhAnhUrl || `https://loremflickr.com/400/300/house?lock=${item.id}`;
                     html += `
                             <div class="card" onclick="viewDetail('${item.id}')">
-                                <div class="card-img-wrapper">
-                                    <img src="${realImg}" class="card-img" alt="House">
+                                <div style="position:relative;">
+                                    <img src="${realImg}" class="card-img">
                                     <span class="price-tag">${item.gia.toLocaleString('vi-VN')} đ</span>
                                 </div>
                                 <div class="card-content">
                                     <small style="color:var(--primary); font-weight:bold; text-transform:uppercase;">${item.loaiHinh}</small>
-                                    <h3 style="margin: 10px 0; font-size:22px;">${item.tieuDe}</h3>
-                                    <p style="color: #666; font-size: 14px;"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</p>
-
+                                    <h3 style="margin: 8px 0; font-size:18px; color:var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.tieuDe}</h3>
+                                    <p style="color: #666; font-size: 13px; margin:0;"><i class="fas fa-map-marker-alt"></i> ${item.diaChi}</p>
                                     <div class="info-row">
                                         <span><i class="fas fa-bed"></i> ${item.phongNgu || 0} PN</span>
                                         <span><i class="fas fa-expand"></i> ${item.dienTich || 0} m²</span>
                                     </div>
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                 });
             }
             document.getElementById('list-bds').innerHTML = html;
+        }
+
+        // --- GỌI API THẬT CHO DỰ ÁN & TIN TỨC ---
+        function loadProjectsUI() {
+            document.getElementById("main-title").innerText = "Dự án Bất động sản Nổi bật";
+            fetch('/api/Project').then(res => res.json()).then(data => {
+                let html = '';
+                if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center;">Chưa có dự án nào.</p>';
+                data.forEach(p => {
+                    html += `<div class="card" style="padding: 25px; border-top: 4px solid var(--success);">
+                            <h3 style="color: var(--primary); margin: 0 0 10px 0; font-size: 22px;">${p.name}</h3>
+                            <p style="color: var(--dark); font-size: 14px;"><strong>Chủ đầu tư:</strong> ${p.investor || 'Đang cập nhật'}</p>
+                            <button style="width: 100%; margin-top: 10px; padding: 8px; background: white; border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; font-weight: bold;">Xem chi tiết</button>
+                        </div>`;
+                });
+                document.getElementById('list-bds').innerHTML = html;
+                document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        function loadNewsUI() {
+            document.getElementById("main-title").innerText = "Tin tức Thị trường";
+            document.getElementById('list-bds').innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Đang tải bài viết...</p>';
+
+            // GỌI API TIN TỨC THẬT TỪ MONGODB
+            fetch('/api/News').then(res => res.json()).then(data => {
+                let html = '';
+                if (data.length === 0) html = '<p style="grid-column: 1/-1; text-align:center;">Chưa có bài viết nào được đăng.</p>';
+                data.forEach(n => {
+                    const date = new Date(n.createdAt).toLocaleDateString('vi-VN');
+                    html += `
+                        <div class="card" style="display: flex; flex-direction: column;">
+                            <img src="${n.imageUrl}" style="width: 100%; height: 200px; object-fit: cover;">
+                            <div style="padding: 20px;">
+                                <small style="color: var(--gray);"><i class="far fa-clock"></i> ${date} - ${n.author}</small>
+                                <h3 style="margin: 10px 0; color: var(--dark); font-size: 18px;">${n.title}</h3>
+                                <p style="color: #666; font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${n.description}</p>
+                            </div>
+                        </div>`;
+                });
+                document.getElementById('list-bds').innerHTML = html;
+                document.getElementById('main-title').scrollIntoView({ behavior: 'smooth' });
+            }).catch(e => {
+                document.getElementById('list-bds').innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:red;">Bạn cần thêm NewsController.cs vào Backend để tính năng này hoạt động!</p>';
+            });
         }
     </script>
 </body>
