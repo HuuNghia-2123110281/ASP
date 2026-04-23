@@ -17,6 +17,7 @@ namespace asp.Data
         public double DienTich { get; set; }
         public int PhongNgu { get; set; }
         public string? HinhAnhUrl { get; set; }
+        public string? LoaiGiaoDich { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string? ProjectId { get; set; }

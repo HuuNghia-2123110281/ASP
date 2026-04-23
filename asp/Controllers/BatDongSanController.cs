@@ -162,7 +162,8 @@ namespace asp.Controllers
     [FromQuery] double? maxGia,
     [FromQuery] double? minDienTich,
     [FromQuery] double? maxDienTich,
-    [FromQuery] int? phongNgu)
+    [FromQuery] int? phongNgu,
+    [FromQuery] string? loaiGiaoDich)
         {
             var builder = Builders<BatDongSan>.Filter;
             var filter = builder.Empty;

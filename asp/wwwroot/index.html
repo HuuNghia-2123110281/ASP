@@ -831,6 +831,10 @@
             const areaRange = document.getElementById("searchArea").value;
             const bedrooms = document.getElementById("searchBedrooms").value;
 
+            // ĐỌC GIÁ TRỊ CỦA Ô RADIO (BÁN HAY CHO THUÊ)
+            const transTypeRaw = document.querySelector('input[name="transType"]:checked').value;
+            const loaiGiaoDich = transTypeRaw === 'ban' ? 'Bán' : 'Cho thuê';
+
             document.getElementById("main-title").innerText = `Kết quả tìm kiếm`;
 
             let minPrice = "", maxPrice = "";
@@ -840,6 +844,8 @@
             if (areaRange) [minArea, maxArea] = areaRange.split('-');
 
             let url = `/api/BatDongSan/filter?`;
+            url += `loaiGiaoDich=${encodeURIComponent(loaiGiaoDich)}&`;
+
             if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
             if (type !== "Tất cả") url += `loaiHinh=${encodeURIComponent(type)}&`;
             if (minPrice) url += `minGia=${minPrice}&`;
