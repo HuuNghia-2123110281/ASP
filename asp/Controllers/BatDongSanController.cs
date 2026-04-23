@@ -161,7 +161,8 @@ namespace asp.Controllers
     [FromQuery] double? minGia,
     [FromQuery] double? maxGia,
     [FromQuery] double? minDienTich,
-    [FromQuery] double? maxDienTich)
+    [FromQuery] double? maxDienTich,
+    [FromQuery] int? phongNgu)
         {
             var builder = Builders<BatDongSan>.Filter;
             var filter = builder.Empty;
@@ -196,6 +197,18 @@ namespace asp.Controllers
             if (maxDienTich.HasValue)
             {
                 filter &= builder.Lte(x => x.DienTich, maxDienTich.Value);
+            }
+            // 5.LỌC THEO PHÒNG NGỦ
+            if (phongNgu.HasValue)
+            {
+                if (phongNgu.Value >= 5)
+                {
+                    filter &= builder.Gte(x => x.PhongNgu, 5);
+                }
+                else
+                {
+                    filter &= builder.Eq(x => x.PhongNgu, phongNgu.Value);
+                }
             }
             var list = await _bdsCollection.Find(filter)
                 .SortByDescending(x => x.Id)

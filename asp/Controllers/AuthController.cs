@@ -88,7 +88,7 @@ namespace asp.Controllers
             try
             {
                 var fromAddress = new MailAddress("nguyenhuunghia03052004@gmail.com", "BĐS Hỗ Trợ");
-                var toAddress = new MailAddress(user.Email);
+                var toAddress = new MailAddress(user.Email!);
                 const string fromPassword = "fgiidufvbljcasrj";
 
                 var smtp = new SmtpClient
@@ -149,11 +149,11 @@ namespace asp.Controllers
         }
     }
 
-    public class ForgotPasswordRequest { public string Username { get; set; } }
+    public class ForgotPasswordRequest { public string? Username { get; set; } }
     public class ResetPasswordRequest
     {
-        public string Email { get; set; }
-        public string Otp { get; set; }
-        public string NewPassword { get; set; }
+        public string? Email { get; set; }
+        public string? Otp { get; set; }
+        public string? NewPassword { get; set; }
     }
 }
