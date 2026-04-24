@@ -44,8 +44,11 @@ namespace asp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateNews(string id, [FromBody] News news)
         {
+            if (string.IsNullOrEmpty(id)) return BadRequest(new { message = "ID không hợp lệ!" });
             var existingNews = await _newsCollection.Find(n => n.Id == id).FirstOrDefaultAsync();
-            if (existingNews == null) return NotFound();
+            if (existingNews == null) return NotFound(new { message = "Không tìm thấy tin tức để cập nhật!" });
+            if (string.IsNullOrWhiteSpace(news.Title))
+                return BadRequest(new { message = "Tiêu đề không được để trống!" });
 
             existingNews.Title = news.Title;
             existingNews.Description = news.Description;
@@ -53,8 +56,12 @@ namespace asp.Controllers
             existingNews.Author = news.Author;
             existingNews.UpdatedAt = DateTime.Now;
 
-            await _newsCollection.ReplaceOneAsync(n => n.Id == id, existingNews);
-            return Ok(new { message = "Cập nhật tin tức thành công!" });
+            var result = await _newsCollection.ReplaceOneAsync(n => n.Id == id, existingNews);
+            if (result.IsAcknowledged && result.ModifiedCount > 0)
+            {
+                return Ok(new { message = "Cập nhật tin tức thành công!" });
+            }
+            return StatusCode(500, new { message = "Có lỗi xảy ra trong quá trình lưu dữ liệu!" });
         }
     }
 }

@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chỉnh sửa Tin tức - BĐS Nghĩa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,50 +14,22 @@
 
         body {
             font-family: 'Nunito', sans-serif;
-            margin: 0;
             background-color: var(--bg-light);
+            margin: 0;
             display: flex;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
-            color: white;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .topbar {
-            background: white;
-            height: 70px;
-            display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 0 25px;
-            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15);
-        }
-
-        .container-fluid {
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
+            min-height: 100vh;
         }
 
         .card {
             background: white;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.1);
-            border-top: 4px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            border-top: 5px solid var(--primary);
         }
 
         .form-group {
@@ -76,7 +47,7 @@
                 width: 100%;
                 padding: 12px;
                 border: 1px solid #d1d3e2;
-                border-radius: 5px;
+                border-radius: 8px;
                 outline: none;
                 box-sizing: border-box;
             }
@@ -85,13 +56,13 @@
             background: var(--success);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            transition: 0.3s;
             font-size: 16px;
+            transition: 0.3s;
         }
 
             .btn-save:hover {
@@ -100,108 +71,93 @@
 
         #imgPreview {
             width: 100%;
-            max-height: 250px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-top: 10px;
-            display: none;
-            border: 1px solid #ddd;
+            border: 1px solid #eee;
         }
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <header class="topbar">
-            <div style="font-weight: bold; color: var(--dark);">TRANG QUẢN TRỊ TIN TỨC</div>
-            <a href="manage-news.html" style="text-decoration:none; color:var(--primary); font-weight:bold;"><i class="fas fa-arrow-left"></i> Quay lại</a>
-        </header>
+    <div class="card">
+        <h2 style="text-align:center; margin-top:0;"><i class="fas fa-edit"></i> SỬA BÀI VIẾT</h2>
 
-        <div class="container-fluid">
-            <div class="card">
-                <h2 style="text-align:center; margin-top:0; color:var(--dark);">CHỈNH SỬA BÀI VIẾT</h2>
-
-                <div class="form-group">
-                    <label>Tiêu đề bài viết</label>
-                    <input type="text" id="editTitle">
-                </div>
-
-                <div class="form-group">
-                    <label>Nội dung chi tiết</label>
-                    <textarea id="editDesc" rows="8"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Hình ảnh hiện tại</label>
-                    <img id="imgPreview" src="">
-                    <input type="file" id="editFile" accept="image/*" style="margin-top:10px;" onchange="handleFile(this)">
-                </div>
-
-                <button class="btn-save" onclick="saveChanges()"><i class="fas fa-save"></i> LƯU THAY ĐỔI</button>
-                <p id="editMsg" style="text-align:center; font-weight:bold; margin-top:15px;"></p>
-            </div>
+        <div class="form-group">
+            <label>Tiêu đề bài viết</label>
+            <input type="text" id="editTitle">
         </div>
+
+        <div class="form-group">
+            <label>Nội dung bài viết</label>
+            <textarea id="editDesc" rows="6"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Hình ảnh bài viết</label>
+            <img id="imgPreview" src="">
+            <input type="file" id="editFile" accept="image/*" style="margin-top:10px;" onchange="previewImage(this)">
+        </div>
+
+        <button class="btn-save" onclick="updateNews()">LƯU THAY ĐỔI</button>
+        <p id="msg" style="text-align:center; font-weight:bold; margin-top:15px;"></p>
+        <div style="text-align:center; margin-top:10px;"><a href="manage-news.html" style="color:var(--dark); text-decoration:none;"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a></div>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const newsId = urlParams.get('id');
-        let currentBase64 = "";
+        let currentImgBase64 = "";
+
+        // 1. Tải dữ liệu cũ
         document.addEventListener("DOMContentLoaded", async () => {
-            if (!newsId) { alert("Không tìm thấy ID tin tức!"); return; }
+            const res = await fetch('/api/News');
+            const list = await res.json();
+            const news = list.find(n => n.id === newsId);
 
-            try {
-                const res = await fetch(`/api/News`);
-                const list = await res.json();
-                const news = list.find(n => n.id === newsId);
-
-                if (news) {
-                    document.getElementById('editTitle').value = news.title;
-                    document.getElementById('editDesc').value = news.description;
-                    currentBase64 = news.imageUrl;
-                    const img = document.getElementById('imgPreview');
-                    img.src = news.imageUrl;
-                    img.style.display = "block";
-                }
-            } catch (e) { console.error("Lỗi tải tin cũ", e); }
+            if (news) {
+                document.getElementById('editTitle').value = news.title;
+                document.getElementById('editDesc').value = news.description;
+                document.getElementById('imgPreview').src = news.imageUrl;
+                currentImgBase64 = news.imageUrl;
+            }
         });
-        function handleFile(input) {
+
+        // 2. Xem trước ảnh mới
+        function previewImage(input) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    currentBase64 = e.target.result;
-                    document.getElementById('imgPreview').src = currentBase64;
+                    currentImgBase64 = e.target.result;
+                    document.getElementById('imgPreview').src = currentImgBase64;
                 };
                 reader.readAsDataURL(file);
             }
         }
-        async function saveChanges() {
-            const msg = document.getElementById('editMsg');
+
+        // 3. Gửi cập nhật lên C#
+        async function updateNews() {
+            const msg = document.getElementById('msg');
             const data = {
-                title: document.getElementById('editTitle').value.trim(),
-                description: document.getElementById('editDesc').value.trim(),
-                imageUrl: currentBase64,
-                author: localStorage.getItem('username') || 'Admin'
+                title: document.getElementById('editTitle').value,
+                description: document.getElementById('editDesc').value,
+                imageUrl: currentImgBase64,
+                author: localStorage.getItem('username') || "Admin"
             };
 
-            if (!data.title || !data.description) {
-                msg.style.color = "red"; msg.innerText = "Không được bỏ trống thông tin!";
-                return;
-            }
+            msg.innerText = "Đang lưu...";
+            const res = await fetch(`/api/News/${newsId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-            try {
-                const res = await fetch(`/api/News/${newsId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (res.ok) {
-                    msg.style.color = "green"; msg.innerText = "Cập nhật thành công! Đang chuyển hướng...";
-                    setTimeout(() => window.location.href = "manage-news.html", 1500);
-                }
-            } catch (e) {
-                msg.style.color = "red"; msg.innerText = "Lỗi kết nối máy chủ!";
+            if (res.ok) {
+                msg.style.color = "green"; msg.innerText = "Cập nhật thành công!";
+                setTimeout(() => window.location.href = 'manage-news.html', 1000);
+            } else {
+                msg.style.color = "red"; msg.innerText = "Lỗi khi lưu!";
             }
         }
     </script>

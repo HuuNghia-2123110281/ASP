@@ -338,14 +338,30 @@
                 if (data.length === 0) html = '<p style="text-align:center; color:#888;">Chưa có bài viết nào.</p>';
                 data.forEach(n => {
                     const d = new Date(n.createdAt).toLocaleDateString('vi-VN');
-                    html += `<div class="news-item">
-                            <img src="${n.imageUrl}" class="news-img">
-                            <div style="flex:1;">
-                                <strong style="color:var(--primary); font-size:16px;">${n.title}</strong>
-                                <div style="font-size:13px; color:#858796; margin-top:5px;"><i class="fas fa-user-edit"></i> Đăng bởi: <b>${n.author}</b> &nbsp;|&nbsp; <i class="far fa-clock"></i> ${d}</div>
-                            </div>
-                            <button class="btn-del" onclick="deleteNews('${n.id}')" title="Xóa bài viết"><i class="fas fa-trash"></i></button>
-                        </div>`;
+                    html += `
+        <div class="news-item">
+            <img src="${n.imageUrl}" class="news-img">
+            <div style="flex:1;">
+                <strong style="color:var(--primary); font-size:16px;">${n.title}</strong>
+                <div style="font-size:13px; color:#858796; margin-top:5px;">
+                    <i class="fas fa-user-edit"></i> Đăng bởi: <b>${n.author}</b> &nbsp;|&nbsp; 
+                    <i class="far fa-clock"></i> ${d}
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.location.href='edit-news.html?id=${n.id}'" 
+                        style="background:#f6c23e; color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer;" 
+                        title="Chỉnh sửa bài viết">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <button class="btn-del" onclick="deleteNews('${n.id}')" 
+                        style="padding:10px 14px; border-radius:8px;" 
+                        title="Xóa bài viết">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>`;
                 });
                 document.getElementById('news-container').innerHTML = html;
             });
