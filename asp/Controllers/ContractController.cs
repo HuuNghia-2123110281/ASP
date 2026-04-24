@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace asp.Controllers
 {
@@ -20,42 +21,55 @@ namespace asp.Controllers
             _contractCollection = database.GetCollection<Contract>("Contracts");
         }
 
-        // 1. THÊM MỚI: Upload file Hợp đồng đa định dạng
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadContract([FromForm] string transactionId, [FromForm] string contractNumber, IFormFile file)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Contract>>> GetAllContracts()
         {
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
-
-            if (file == null || file.Length == 0)
-                return BadRequest(new { message = "Không tìm thấy file tải lên!" });
-
-            var extension = Path.GetExtension(file.FileName).ToLower();
-
-            if (!allowedExtensions.Contains(extension))
-                return BadRequest(new { message = "Hệ thống chỉ chấp nhận định dạng PDF, Word (.doc, .docx) hoặc Hình ảnh (.jpg, .png)!" });
-
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "contracts");
-            if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadDir, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var contract = new Contract
-            {
-                TransactionId = transactionId,
-                ContractNumber = contractNumber,
-                FileUrl = $"/uploads/contracts/{fileName}"
-            };
-            await _contractCollection.InsertOneAsync(contract);
-
-            return Ok(new { message = "Lưu hợp đồng thành công!", data = contract });
+            var list = await _contractCollection.Find(_ => true).ToListAsync();
+            return Ok(list);
         }
 
-        // 2. XEM CHI TIẾT: Lấy hợp đồng ra xem theo Mã Giao Dịch
+        // 1. THÊM MỚI: Upload file Hợp đồng
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadContract([FromForm] ContractRequest request)
+        {
+            try
+            {
+                if (request.File == null || request.File.Length == 0)
+                    return BadRequest(new { message = "Không tìm thấy file tải lên!" });
+
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
+                var extension = Path.GetExtension(request.File.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(extension))
+                    return BadRequest(new { message = "Hệ thống chỉ chấp nhận định dạng PDF, Word (.doc, .docx) hoặc Hình ảnh!" });
+
+                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "contracts");
+                if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
+
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadDir, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.File.CopyToAsync(stream);
+                }
+
+                var contract = new Contract
+                {
+                    TransactionId = request.TransactionId,
+                    ContractNumber = request.ContractNumber,
+                    FileUrl = $"/uploads/contracts/{fileName}"
+                };
+
+                await _contractCollection.InsertOneAsync(contract);
+                return Ok(new { message = "Lưu hợp đồng thành công!", data = contract });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
+            }
+        }
+
+        // 2. XEM CHI TIẾT
         [HttpGet("transaction/{transId}")]
         public async Task<IActionResult> GetByTransaction(string transId)
         {
@@ -64,75 +78,78 @@ namespace asp.Controllers
             return Ok(contract);
         }
 
-        // 3. SỬA: Cập nhật hợp đồng 
+        // 3. SỬA HỢP ĐỒNG
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateContract(string id, [FromForm] string transactionId, [FromForm] string contractNumber, IFormFile? file)
+        public async Task<IActionResult> UpdateContract(string id, [FromForm] ContractRequest request)
         {
-            var existingContract = await _contractCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
-            if (existingContract == null) return NotFound(new { message = "Không tìm thấy hợp đồng để cập nhật!" });
-
-            existingContract.TransactionId = transactionId;
-            existingContract.ContractNumber = contractNumber;
-            if (file != null && file.Length > 0)
+            try
             {
-                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
-                var extension = Path.GetExtension(file.FileName).ToLower();
+                var existingContract = await _contractCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
+                if (existingContract == null) return NotFound(new { message = "Không tìm thấy hợp đồng để cập nhật!" });
 
-                if (!allowedExtensions.Contains(extension))
-                    return BadRequest(new { message = "Định dạng file không hợp lệ!" });
+                existingContract.TransactionId = request.TransactionId;
+                existingContract.ContractNumber = request.ContractNumber;
 
-                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "contracts");
-                if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
-                if (!string.IsNullOrEmpty(existingContract.FileUrl))
+                if (request.File != null && request.File.Length > 0)
                 {
-                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingContract.FileUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(oldFilePath))
+                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
+                    var extension = Path.GetExtension(request.File.FileName).ToLower();
+
+                    if (!allowedExtensions.Contains(extension))
+                        return BadRequest(new { message = "Định dạng file không hợp lệ!" });
+
+                    var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "contracts");
+                    if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
+
+                    if (!string.IsNullOrEmpty(existingContract.FileUrl))
                     {
-                        System.IO.File.Delete(oldFilePath);
+                        var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingContract.FileUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
                     }
+
+                    var fileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadDir, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await request.File.CopyToAsync(stream);
+                    }
+
+                    existingContract.FileUrl = $"/uploads/contracts/{fileName}";
                 }
 
-                var fileName = $"{Guid.NewGuid()}{extension}";
-                var filePath = Path.Combine(uploadDir, fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                existingContract.FileUrl = $"/uploads/contracts/{fileName}";
+                await _contractCollection.ReplaceOneAsync(c => c.Id == id, existingContract);
+                return Ok(new { message = "Cập nhật hợp đồng thành công!" });
             }
-
-            await _contractCollection.ReplaceOneAsync(c => c.Id == id, existingContract);
-            return Ok(new { message = "Cập nhật hợp đồng thành công!" });
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
+            }
         }
 
-        // 4. XÓA: Xóa hợp đồng khỏi Database và Xóa file trong ổ cứng
+        // 4. XÓA HỢP ĐỒNG
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContract(string id)
         {
-            var contract = await _contractCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
-            if (contract == null) return NotFound(new { message = "Không tìm thấy hợp đồng!" });
-            if (!string.IsNullOrEmpty(contract.FileUrl))
+            try
             {
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", contract.FileUrl.TrimStart('/'));
-                if (System.IO.File.Exists(filePath))
+                var contract = await _contractCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
+                if (contract == null) return NotFound(new { message = "Không tìm thấy hợp đồng!" });
+
+                if (!string.IsNullOrEmpty(contract.FileUrl))
                 {
-                    System.IO.File.Delete(filePath);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", contract.FileUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
                 }
+
+                var result = await _contractCollection.DeleteOneAsync(c => c.Id == id);
+                if (result.DeletedCount > 0) return Ok(new { message = "Đã xóa hợp đồng thành công!" });
+
+                return BadRequest(new { message = "Lỗi khi xóa hợp đồng!" });
             }
-            var result = await _contractCollection.DeleteOneAsync(c => c.Id == id);
-
-            if (result.DeletedCount > 0)
-                return Ok(new { message = "Đã xóa hợp đồng thành công!" });
-
-            return BadRequest(new { message = "Lỗi khi xóa hợp đồng!" });
-        }
-        // LẤY TẤT CẢ DANH SÁCH HỢP ĐỒNG (Bổ sung thêm)
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Contract>>> GetAllContracts()
-        {
-            var list = await _contractCollection.Find(_ => true).ToListAsync();
-            return Ok(list);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
+            }
         }
     }
 }
