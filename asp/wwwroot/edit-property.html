@@ -129,6 +129,7 @@
                 border: 1px solid #d1d3e2;
                 border-radius: 5px;
                 outline: none;
+                box-sizing: border-box;
             }
 
         .row {
@@ -166,22 +167,16 @@
     <nav class="sidebar">
         <a href="admin-dashboard.html" class="sidebar-brand">BĐS NGHĨA</a>
         <div class="nav-menu">
-            <a href="admin-dashboard.html" class="nav-item active"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
-
+            <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
             <div class="divider"></div>
-
             <a href="add-property.html" class="nav-item"><i class="fas fa-fw fa-plus-square"></i> Đăng tin mới</a>
-            <a href="manage-properties.html" class="nav-item"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
+            <a href="manage-properties.html" class="nav-item active"><i class="fas fa-fw fa-building"></i> DS Bất động sản</a>
             <a href="manage-system.html" class="nav-item"><i class="fas fa-fw fa-tags"></i> Dự án & Chủ nhà</a>
-
             <div class="divider"></div>
-
             <a href="manage-transactions.html" class="nav-item"><i class="fas fa-fw fa-handshake"></i> Quản lý Giao dịch</a>
             <a href="manage-clients.html" class="nav-item"><i class="fas fa-fw fa-calendar-alt"></i> Lịch hẹn xem nhà</a>
             <a href="manage-customers.html" class="nav-item"><i class="fas fa-fw fa-users"></i> Hồ sơ Khách hàng</a>
-
             <a href="manage-employees.html" id="menu-employees" class="nav-item"><i class="fas fa-fw fa-user-tie"></i> Nhân viên sales</a>
-
             <a href="manage-news.html" class="nav-item"><i class="fas fa-fw fa-newspaper"></i> Quản lý Tin tức</a>
         </div>
     </nav>
@@ -199,14 +194,15 @@
                     <label>Tiêu đề bài đăng</label>
                     <input type="text" id="tieuDe">
                 </div>
-                <div class="form-group">
-                    <label>Loại giao dịch</label>
-                    <select id="loaiGiaoDich">
-                        <option value="Bán">Bán</option>
-                        <option value="Cho thuê">Cho thuê</option>
-                    </select>
-                </div>
+
                 <div class="row">
+                    <div class="col form-group">
+                        <label>Loại giao dịch</label>
+                        <select id="loaiGiaoDich">
+                            <option value="Bán">Bán</option>
+                            <option value="Cho thuê">Cho thuê</option>
+                        </select>
+                    </div>
                     <div class="col form-group">
                         <label>Loại hình</label>
                         <select id="loaiHinh">
@@ -221,16 +217,20 @@
                         <input type="number" id="gia">
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col form-group"><label>Dự án</label><select id="duAn"></select></div>
                     <div class="col form-group"><label>Chủ nhà</label><select id="chuNha"></select></div>
                 </div>
+
                 <div class="row">
                     <div class="col form-group"><label>Diện tích (m²)</label><input type="number" id="dienTich"></div>
                     <div class="col form-group"><label>Phòng ngủ</label><input type="number" id="phongNgu"></div>
                 </div>
+
                 <div class="form-group"><label>Địa chỉ</label><input type="text" id="diaChi"></div>
                 <div class="form-group"><label>Mô tả</label><textarea id="moTa" rows="3"></textarea></div>
+
                 <div class="form-group">
                     <label>Ảnh hiện tại</label>
                     <img id="current-img-preview" src="">
@@ -270,7 +270,7 @@
             const res = await fetch(`/api/BatDongSan/${currentId}`);
             const data = await res.json();
             document.getElementById('tieuDe').value = data.tieuDe;
-            document.getElementById('loaiGiaoDich').value = data.loaiGiaoDich || "Bán/Thuê";
+            document.getElementById('loaiGiaoDich').value = data.loaiGiaoDich || "Bán";
             document.getElementById('loaiHinh').value = data.loaiHinh;
             document.getElementById('gia').value = data.gia;
             document.getElementById('diaChi').value = data.diaChi;
@@ -287,6 +287,7 @@
             const formData = new FormData();
             formData.append("Id", currentId);
             formData.append("TieuDe", document.getElementById('tieuDe').value);
+            formData.append("LoaiGiaoDich", document.getElementById('loaiGiaoDich').value);
             formData.append("LoaiHinh", document.getElementById('loaiHinh').value);
             formData.append("Gia", document.getElementById('gia').value || 0);
             formData.append("DienTich", document.getElementById('dienTich').value || 0);
@@ -304,14 +305,17 @@
 
             msg.style.color = "blue"; msg.innerText = "Đang lưu...";
 
-            const res = await fetch(`/api/BatDongSan/${currentId}`, { method: 'PUT', body: formData });
-            if (res.ok) {
-                msg.style.color = "green"; msg.innerText = "Thành công!";
-                setTimeout(() => location.href = 'manage-properties.html', 1000);
-            } else {
-                const err = await res.json();
-                console.log(err);
-                msg.style.color = "red"; msg.innerText = "Lỗi: " + (err.title || "Dữ liệu không hợp lệ");
+            try {
+                const res = await fetch(`/api/BatDongSan/${currentId}`, { method: 'PUT', body: formData });
+                if (res.ok) {
+                    msg.style.color = "green"; msg.innerText = "Thành công!";
+                    setTimeout(() => location.href = 'manage-properties.html', 1000);
+                } else {
+                    const err = await res.json();
+                    msg.style.color = "red"; msg.innerText = "Lỗi: " + (err.title || err.message || "Dữ liệu không hợp lệ");
+                }
+            } catch (err) {
+                msg.style.color = "red"; msg.innerText = "Lỗi kết nối máy chủ!";
             }
         }
     </script>

@@ -26,7 +26,6 @@
             overflow: hidden;
         }
 
-        /* SIDEBAR & TOPBAR */
         .sidebar {
             width: 250px;
             background-image: linear-gradient(180deg, var(--primary) 10%, var(--primary-dark) 100%);
@@ -49,12 +48,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-            .sidebar-brand i {
-                transform: rotate(-15deg);
-                margin-right: 10px;
-                font-size: 24px;
-            }
-
         .nav-menu {
             flex: 1;
             overflow-y: auto;
@@ -67,7 +60,6 @@
             font-weight: 800;
             color: rgba(255, 255, 255, 0.4);
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .nav-item {
@@ -82,19 +74,9 @@
             transition: 0.2s;
         }
 
-            .nav-item i {
-                width: 20px;
-                text-align: center;
-                font-size: 16px;
-            }
-
             .nav-item:hover, .nav-item.active {
                 color: white;
             }
-
-                .nav-item.active i {
-                    color: white;
-                }
 
         .divider {
             border-top: 1px solid rgba(255, 255, 255, 0.15);
@@ -127,12 +109,7 @@
             background: var(--bg-light);
             padding: 8px 15px;
             border-radius: 20px;
-            transition: 0.3s;
         }
-
-            .topbar-left a:hover {
-                background: #eaecf4;
-            }
 
         .user-profile {
             display: flex;
@@ -140,22 +117,14 @@
             gap: 15px;
         }
 
-            .user-profile span {
-                font-weight: 600;
-                color: var(--dark);
-                font-size: 14px;
-            }
-
         .btn-logout {
             color: var(--danger);
             background: none;
             border: none;
             cursor: pointer;
             font-size: 18px;
-            padding: 5px;
         }
 
-        /* FORM BĐS STYLES */
         .container-fluid {
             padding: 25px;
         }
@@ -195,16 +164,9 @@
                 padding: 10px 15px;
                 border: 1px solid #d1d3e2;
                 border-radius: 5px;
-                font-size: 14px;
-                box-sizing: border-box;
                 outline: none;
-                transition: 0.3s;
+                box-sizing: border-box;
             }
-
-                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-                    border-color: var(--primary);
-                    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-                }
 
         .row {
             display: flex;
@@ -274,13 +236,8 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
             margin-top: 10px;
         }
-
-            .submit-btn:hover {
-                background: #17a673;
-            }
 
         #message {
             text-align: center;
@@ -291,9 +248,7 @@
 </head>
 <body>
     <nav class="sidebar">
-        <a href="admin-dashboard.html" class="sidebar-brand">
-            <i class="fas fa-laugh-wink"></i> BĐS NGHĨA
-        </a>
+        <a href="admin-dashboard.html" class="sidebar-brand"><i class="fas fa-laugh-wink"></i> BĐS NGHĨA</a>
         <div class="nav-menu">
             <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-fw fa-tachometer-alt"></i> Dashboard</a>
             <div class="divider"></div>
@@ -329,17 +284,11 @@
                     <label>Tiêu đề bài đăng <span style="color:red">*</span></label>
                     <input type="text" id="tieuDe" placeholder="VD: Bán biệt thự biển Phú Quốc...">
                 </div>
-                <div class="form-group">
-                    <label>Loại giao dịch</label>
-                    <select id="loaiGiaoDich">
-                        <option value="Bán">Bán</option>
-                        <option value="Cho thuê">Cho thuê</option>
-                    </select>
-                </div>
+
                 <div class="row">
                     <div class="col form-group">
-                        <label>Hình thức <span style="color:red">*</span></label>
-                        <select id="hinhThuc">
+                        <label>Loại giao dịch <span style="color:red">*</span></label>
+                        <select id="loaiGiaoDich">
                             <option value="Bán">Bán</option>
                             <option value="Cho thuê">Cho thuê</option>
                         </select>
@@ -466,16 +415,19 @@
             const formData = new FormData();
             formData.append("TieuDe", document.getElementById('tieuDe').value);
             formData.append("LoaiGiaoDich", document.getElementById('loaiGiaoDich').value);
-            formData.append("HinhThuc", document.getElementById('hinhThuc').value);
-
             formData.append("LoaiHinh", document.getElementById('loaiHinh').value);
-            formData.append("Gia", document.getElementById('gia').value);
+            formData.append("Gia", document.getElementById('gia').value || 0);
+            formData.append("DienTich", document.getElementById('dienTich').value || 0);
+            formData.append("PhongNgu", document.getElementById('phongNgu').value || 0);
             formData.append("DiaChi", document.getElementById('diaChi').value);
-            formData.append("ProjectId", document.getElementById('duAn').value);
-            formData.append("OwnerId", document.getElementById('chuNha').value);
-            formData.append("DienTich", document.getElementById('dienTich').value);
-            formData.append("PhongNgu", document.getElementById('phongNgu').value);
             formData.append("MoTa", document.getElementById('moTa').value);
+
+            const pId = document.getElementById('duAn').value;
+            if (pId) formData.append("ProjectId", pId);
+
+            const oId = document.getElementById('chuNha').value;
+            if (oId) formData.append("OwnerId", oId);
+
             formData.append("HinhAnhFile", selectedFiles[0]);
 
             try {
