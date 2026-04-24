@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using asp.Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace asp.Controllers
 {
@@ -17,42 +18,36 @@ namespace asp.Controllers
             _customerCollection = database.GetCollection<Customer>("Customers");
         }
 
+        // 1. LẤY TẤT CẢ KHÁCH HÀNG (GET ALL)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
-            return Ok(await _customerCollection.Find(_ => true).SortByDescending(x => x.Id).ToListAsync());
+            var list = await _customerCollection.Find(_ => true).SortByDescending(c => c.CreatedAt).ToListAsync();
+            return Ok(list);
         }
 
-        // Xem chi tiết 1 khách hàng
+        // 2. LẤY CHI TIẾT 1 KHÁCH HÀNG (GET ONE)
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetById(string id)
+        public async Task<ActionResult<Customer>> GetCustomer(string id)
         {
             var customer = await _customerCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
-            if (customer == null) return NotFound(new { message = "Không tìm thấy khách hàng!" });
+            if (customer == null) return NotFound();
             return Ok(customer);
         }
 
+        // 3. THÊM MỚI (POST)
         [HttpPost]
-        public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] Customer customer)
         {
-            if (string.IsNullOrEmpty(customer.Name) || string.IsNullOrEmpty(customer.Phone))
-                return BadRequest(new { message = "Tên và Số điện thoại là bắt buộc!" });
+            if (string.IsNullOrWhiteSpace(customer.FullName) || string.IsNullOrWhiteSpace(customer.Phone))
+                return BadRequest(new { message = "Họ tên và Số điện thoại không được để trống!" });
 
+            customer.CreatedAt = DateTime.Now;
             await _customerCollection.InsertOneAsync(customer);
-            return Ok(customer);
+            return Ok(new { message = "Thêm khách hàng thành công!", data = customer });
         }
 
-        // Cập nhật thông tin khách hàng
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, Customer updatedCustomer)
-        {
-            var result = await _customerCollection.ReplaceOneAsync(c => c.Id == id, updatedCustomer);
-            if (result.MatchedCount == 0) return NotFound(new { message = "Không tìm thấy khách hàng để cập nhật!" });
-            return Ok(new { message = "Cập nhật thành công!" });
-        }
-        // --- CHỈ THÊM 2 HÀM NÀY VÀO CUSTOMER CONTROLLER ---
-
-        // 1. SỬA THÔNG TIN KHÁCH HÀNG (PUT)
+        // 4. CẬP NHẬT (PUT)
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCustomer(string id, [FromBody] Customer customerIn)
         {
@@ -61,7 +56,6 @@ namespace asp.Controllers
                 var existing = await _customerCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
                 if (existing == null) return NotFound(new { message = "Không tìm thấy khách hàng!" });
 
-                // Cập nhật thông tin mới
                 existing.FullName = customerIn.FullName;
                 existing.Phone = customerIn.Phone;
                 existing.Email = customerIn.Email;
@@ -76,7 +70,7 @@ namespace asp.Controllers
             }
         }
 
-        // 2. XÓA KHÁCH HÀNG (DELETE)
+        // 5. XÓA (DELETE)
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(string id)
         {
