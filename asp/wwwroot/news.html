@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin tức Thị trường Bất động sản - BĐS Nghĩa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --accent: #e91e63;
+            --dark: #202124;
+            --gray: #5f6368;
+            --success: #00a652;
+            --bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: #202124;
+        }
+
+        header {
+            background: var(--dark);
+            padding: 15px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #4da3ff;
+            text-decoration: none;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+            .nav-links > a, .dropdown > a {
+                text-decoration: none;
+                color: #fff;
+                font-weight: 600;
+                font-size: 15px;
+                padding: 10px 0;
+                transition: 0.3s;
+                cursor: pointer;
+            }
+
+                .nav-links > a:hover {
+                    color: #4da3ff;
+                }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            padding: 10px 0;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 240px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            top: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: var(--dark) !important;
+            padding: 12px 20px !important;
+            text-decoration: none;
+            display: block;
+            font-weight: 500 !important;
+            border-bottom: 1px solid #f5f5f5;
+            transition: 0.2s;
+        }
+
+            .dropdown-content a:hover {
+                background-color: #f8f9fa;
+                color: var(--primary) !important;
+                padding-left: 26px !important;
+            }
+
+        .auth-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-header {
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #666;
+            color: white;
+            transition: 0.3s;
+        }
+
+            .btn-header:hover {
+                border-color: #fff;
+            }
+
+        .user-profile-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-greeting {
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .user-greeting:hover {
+                color: #4da3ff;
+            }
+
+        .user-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            top: 100%;
+            right: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .user-profile-menu:hover .user-dropdown-content {
+            display: block;
+        }
+
+        .user-dropdown-content a {
+            color: var(--dark);
+            padding: 12px 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+            transition: 0.2s;
+        }
+
+            .user-dropdown-content a:hover {
+                background-color: #f8f9fa;
+                color: var(--primary);
+                padding-left: 25px;
+            }
+        .page-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            color: var(--dark);
+            font-size: 28px;
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 30px;
+        }
+
+        .featured-news {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #eee;
+        }
+
+            .featured-news:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+
+                .featured-news:hover h2 {
+                    color: var(--primary);
+                }
+
+        .featured-img {
+            width: 60%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .featured-content {
+            width: 40%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .featured-content .meta {
+                color: var(--danger);
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            .featured-content h2 {
+                font-size: 28px;
+                margin: 0 0 15px 0;
+                color: var(--dark);
+                line-height: 1.4;
+                transition: 0.3s;
+            }
+
+            .featured-content p {
+                color: #666;
+                font-size: 16px;
+                line-height: 1.6;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                margin-bottom: 20px;
+            }
+
+            .featured-content .author {
+                color: var(--gray);
+                font-size: 14px;
+            }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .news-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
+
+                .news-card:hover h3 {
+                    color: var(--primary);
+                }
+
+            .news-card img {
+                width: 100%;
+                height: 220px;
+                object-fit: cover;
+            }
+
+        .news-card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .news-card-body .meta {
+                color: var(--gray);
+                font-size: 13px;
+                margin-bottom: 10px;
+                display: flex;
+                gap: 15px;
+            }
+
+            .news-card-body h3 {
+                font-size: 18px;
+                margin: 0 0 10px 0;
+                color: var(--dark);
+                line-height: 1.4;
+                transition: 0.3s;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .news-card-body p {
+                color: #666;
+                font-size: 14px;
+                line-height: 1.5;
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+        @media (max-width: 900px) {
+            .featured-news {
+                flex-direction: column;
+            }
+
+            .featured-img {
+                width: 100%;
+                height: 250px;
+            }
+
+            .featured-content {
+                width: 100%;
+                padding: 25px;
+                box-sizing: border-box;
+            }
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 30px 5%;
+            text-align: center;
+            margin-top: 60px;
+            border-top: 3px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-home"></i> BĐS NGHĨA</a>
+        <nav class="nav-links">
+            <a href="index.html">Trang chủ</a>
+            <div class="dropdown">
+                <a href="#">Nhà đất bán <i class="fas fa-angle-down"></i></a>
+                <div class="dropdown-content">
+                    <a href="index.html">Bán căn hộ chung cư</a>
+                    <a href="index.html">Bán nhà riêng, nhà phố</a>
+                    <a href="index.html">Bán biệt thự, liền kề</a>
+                    <a href="index.html">Bán đất nền dự án</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#">Cho thuê <i class="fas fa-angle-down"></i></a>
+                <div class="dropdown-content">
+                    <a href="index.html">Cho thuê căn hộ chung cư</a>
+                    <a href="index.html">Cho thuê nhà riêng</a>
+                    <a href="index.html">Cho thuê văn phòng</a>
+                </div>
+            </div>
+            <a href="index.html">Dự án</a>
+            <a href="news.html" style="color: var(--primary);">Tin tức</a>
+        </nav>
+
+        <div class="auth-box" id="auth-section">
+            <a href="login.html" class="btn-header"><i class="fas fa-user-circle"></i> Đăng nhập</a>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <h1 class="page-title">Tin tức Thị trường</h1>
+
+        <div id="news-container">
+            <p style="text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Đang tải tin tức...</p>
+        </div>
+    </div>
+
+    <footer><p>© 2026 BĐS Nghĩa - Nền tảng Proptech Hàng Đầu</p></footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const fullName = localStorage.getItem("username");
+            const role = localStorage.getItem("role");
+            const authSection = document.getElementById("auth-section");
+
+            if (fullName) {
+                let menuHTML = '';
+                if (role === "Admin") {
+                    menuHTML += `<a href="admin-dashboard.html" class="btn-header" style="border:none;"><i class="fas fa-user-shield"></i> Trang Quản Trị</a>`;
+                } else if (role === "Sales") {
+                    menuHTML += `<a href="admin-dashboard.html" class="btn-header" style="background:var(--success); border-color:var(--success);"><i class="fas fa-edit"></i> Sales Panel</a>`;
+                }
+                menuHTML += `
+                        <div class="user-profile-menu" style="margin-left: 15px;">
+                            <div class="user-greeting">
+                                <i class="fas fa-user-circle" style="font-size: 22px; color: #4da3ff;"></i>
+                                ${fullName} <i class="fas fa-angle-down" style="font-size: 12px; margin-left: 2px;"></i>
+                            </div>
+                            <div class="user-dropdown-content">
+                                <a href="profile.html"><i class="fas fa-id-badge" style="color:var(--primary); width:20px;"></i> Hồ sơ cá nhân</a>
+                                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt" style="color:var(--danger); width:20px;"></i> Đăng xuất</a>
+                            </div>
+                        </div>`;
+                authSection.innerHTML = menuHTML;
+            }
+
+            loadAllNews();
+        });
+
+        function logout() { localStorage.clear(); window.location.reload(); }
+        function viewNewsDetail(id) { window.location.href = `news-detail.html?id=${id}`; }
+
+        function loadAllNews() {
+            fetch('/api/News')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('news-container');
+
+                    if (data.length === 0) {
+                        container.innerHTML = '<p style="text-align:center; color: #666; font-size: 18px;">Hiện tại chưa có bài viết nào được xuất bản.</p>';
+                        return;
+                    }
+                    data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                    const newestNews = data.shift();
+
+                    let html = '';
+
+                    const fDate = new Date(newestNews.createdAt).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    const fImg = newestNews.imageUrl || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?fit=crop&w=1200&q=80';
+
+                    html += `
+                            <div class="featured-news" onclick="viewNewsDetail('${newestNews.id}')">
+                                <img src="${fImg}" class="featured-img">
+                                <div class="featured-content">
+                                    <div class="meta"><i class="fas fa-bolt"></i> TIN MỚI NHẤT</div>
+                                    <h2>${newestNews.title}</h2>
+                                    <p>${newestNews.description}</p>
+                                    <div class="author"><i class="far fa-clock"></i> ${fDate} &nbsp;•&nbsp; <i class="fas fa-user-edit"></i> ${newestNews.author || 'Ban biên tập'}</div>
+                                </div>
+                            </div>
+                        `;
+                    if (data.length > 0) {
+                        html += `<div class="news-grid">`;
+                        data.forEach(n => {
+                            const date = new Date(n.createdAt).toLocaleDateString('vi-VN');
+                            const img = n.imageUrl || 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?fit=crop&w=600&q=80';
+
+                            html += `
+                                    <div class="news-card" onclick="viewNewsDetail('${n.id}')">
+                                        <img src="${img}">
+                                        <div class="news-card-body">
+                                            <div class="meta">
+                                                <span><i class="far fa-clock"></i> ${date}</span>
+                                                <span><i class="fas fa-pen"></i> ${n.author || 'Ban biên tập'}</span>
+                                            </div>
+                                            <h3>${n.title}</h3>
+                                            <p>${n.description}</p>
+                                        </div>
+                                    </div>
+                                `;
+                        });
+                        html += `</div>`;
+                    }
+
+                    container.innerHTML = html;
+                })
+                .catch(e => {
+                    document.getElementById('news-container').innerHTML = '<p style="text-align:center; color:red;">Lỗi kết nối máy chủ! Không thể tải tin tức lúc này.</p>';
+                });
+        }
+    </script>
+</body>
+</html>
